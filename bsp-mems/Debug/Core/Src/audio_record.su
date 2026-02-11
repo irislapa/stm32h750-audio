@@ -1,0 +1,5 @@
+../Core/Src/audio_record.c:221:20:rec_copy_chunk.constprop	16	static
+../Core/Src/audio_record.c:138:6:AudioRecord_demo	48	static,ignoring_inline_asm
+../Core/Src/audio_record.c:241:10:get_g_rec_wr	0	static
+../Core/Src/audio_record.c:251:6:BSP_AUDIO_IN_TransferComplete_CallBack	16	static,ignoring_inline_asm
+../Core/Src/audio_record.c:285:6:BSP_AUDIO_IN_HalfTransfer_CallBack	16	static,ignoring_inline_asm
