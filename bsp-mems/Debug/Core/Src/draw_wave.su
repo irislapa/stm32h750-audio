@@ -1,5 +1,5 @@
-../Core/Src/draw_wave.c:23:6:draw_q_push	16	static
-../Core/Src/draw_wave.c:33:9:draw_q_pop	16	static
-../Core/Src/draw_wave.c:46:6:displayDimensions	8	static
-../Core/Src/draw_wave.c:56:6:DrawWaveformBlock	64	static
-../Core/Src/draw_wave.c:114:6:DrawWaveformBlockN	32	static
+../Core/Src/draw_wave.c:11:6:init_DrawWave	16	static
+../Core/Src/draw_wave.c:35:6:draw_q_push	24	static
+../Core/Src/draw_wave.c:45:15:draw_q_pop	16	static
+../Core/Src/draw_wave.c:61:6:DrawHalfCB	56	static
+../Core/Src/draw_wave.c:91:6:DrawWave_process	40	static,ignoring_inline_asm

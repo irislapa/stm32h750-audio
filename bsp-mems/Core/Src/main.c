@@ -19,6 +19,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
+#include "tim.h"
 
 /** @addtogroup STM32H7xx_HAL_Examples
   * @{
@@ -30,8 +33,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+// todo:
 uint32_t channel_nbr = 1;
-
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t DemoIndex = 0;
@@ -133,6 +136,7 @@ int main(void)
   BSP_LCD_Init(0, LCD_ORIENTATION_LANDSCAPE);
   UTIL_LCD_SetFuncDriver(&LCD_Driver);
   Display_DemoDescription();
+
 
   //AudioPlay_demo();
   AudioRecord_demo();
@@ -404,6 +408,10 @@ static void CPU_CACHE_Enable(void)
   /* Enable D-Cache */
   SCB_EnableDCache();
 }
+
+
+
+
 
 /**
   * @}

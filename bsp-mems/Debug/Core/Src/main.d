@@ -66,7 +66,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.h \
  ../Drivers/BSP/STM32H750B-DK/../Components/mt48lc4m32b2/mt48lc4m32b2.h \
  ../Core/Inc/mt48lc4m32b2_conf.h ../Utilities/lcd/stm32_lcd.h \
- ../Utilities/Fonts/fonts.h
+ ../Utilities/Fonts/fonts.h ../Core/Inc/adc.h ../Core/Inc/main.h \
+ ../Core/Inc/dma.h ../Core/Inc/tim.h
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 ../Core/Inc/stm32h7xx_hal_conf.h:
@@ -137,3 +138,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/mt48lc4m32b2_conf.h:
 ../Utilities/lcd/stm32_lcd.h:
 ../Utilities/Fonts/fonts.h:
+../Core/Inc/adc.h:
+../Core/Inc/main.h:
+../Core/Inc/dma.h:
+../Core/Inc/tim.h:

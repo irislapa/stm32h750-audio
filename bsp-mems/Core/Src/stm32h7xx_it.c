@@ -34,7 +34,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-
+/* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc3;
 /******************************************************************************/
 /*            Cortex-M7 Processor Exceptions Handlers                         */
 /******************************************************************************/
@@ -191,6 +192,20 @@ void AUDIO_IN_SAI_PDMx_DMAx_IRQHandler(void)
 void MDMA_IRQHandler(void)
 {
   BSP_SDRAM_IRQHandler(0);
+}
+
+/**
+  * @brief This function handles DMA1 stream0 global interrupt.
+  */
+void DMA1_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc3);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 /**
   * @}

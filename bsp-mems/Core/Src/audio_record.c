@@ -118,6 +118,7 @@ static int16_t g_rec_pcm[REC_SAMPLES];
 static volatile uint32_t g_rec_wr = 0;
 static volatile uint8_t  g_rec_done  = 0;
 
+draw_wave_t pdm_draw_h;
 
 /* Private function prototypes -----------------------------------------------*/
 //static void rec_copy_chunk(const int16_t *src, uint32_t n_samples);
@@ -158,7 +159,7 @@ void AudioRecord_demo(void)
   UTIL_LCD_DrawRect(10, 100, x_size - 20, y_size - 110, UTIL_LCD_COLOR_BLUE);
   UTIL_LCD_DrawRect(11, 101, x_size - 22, y_size - 112, UTIL_LCD_COLOR_BLUE);
 
-  displayDimensions(12, 102, x_size - 24, y_size - 114);
+  //displayDimensions(12, 102, x_size - 24, y_size - 114);
 
   AudioFreq_ptr = AudioFreq+4; /* AUDIO_FREQUENCY_16K; */
 
@@ -180,6 +181,7 @@ void AudioRecord_demo(void)
 
   BSP_AUDIO_OUT_Init(0, &AudioOutInit);
 
+  init_DrawWave(&pdm_draw_h, (int16_t *) RecPlayback[0],  12, 102, x_size - 24, y_size - 114);
   /* Start Recording */
   UTIL_LCD_DisplayStringAt(0, 190, (uint8_t *)"Start Recording ", CENTER_MODE);
   BSP_AUDIO_IN_RecordPDM(1, (uint8_t*)&recordPDMBuf, 2*AUDIO_IN_PDM_BUFFER_SIZE);
@@ -188,21 +190,10 @@ void AudioRecord_demo(void)
   UTIL_LCD_DisplayStringAt(0, 220, (uint8_t *)"Play the recorded buffer... ", CENTER_MODE);
   BSP_AUDIO_OUT_Play(0, (uint8_t*)&RecPlayback[0], 2*AUDIO_BUFF_SIZE);
 
-  uint8_t DISP_OK = 0;
   while (1)
   {
 
-	disp_block_t blk;
-
-	__disable_irq();
-	DISP_OK = draw_q_pop(&blk);
-	__enable_irq();
-
-	if (DISP_OK)
-	{
-	    DrawWaveformBlockN((int16_t*)&RecPlayback[blk.start], blk.len, blk.trans);
-	    DISP_OK = 0;
-	}
+	 DrawWave_process(&pdm_draw_h);
 
     if (CheckForUserInput() > 0)
     {
@@ -262,9 +253,14 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 
     int16_t *pcm_chunk = (int16_t*)&RecPlayback[playbackPtr];
 
+    audio_chunk_t draw_chunk = {
+	  .data = pcm_chunk,
+	  .n_samples = PCM_SAMPLES_PER_CB
+	};
+
     __disable_irq();
-    rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
-    draw_q_push(playbackPtr, PCM_SAMPLES_PER_CB, TRANSFER_COMPLETE);
+    //rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
+    draw_q_push(&pdm_draw_h, draw_chunk);
     __enable_irq();
 
     playbackPtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
@@ -296,9 +292,13 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 
     int16_t *pcm_chunk = (int16_t*)&RecPlayback[playbackPtr];
 
+    audio_chunk_t draw_chunk = {
+	  .data = pcm_chunk,
+	  .n_samples = PCM_SAMPLES_PER_CB
+	};
     __disable_irq();
-    rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
-    draw_q_push(playbackPtr, PCM_SAMPLES_PER_CB, TRANSFER_HALF);
+    //rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
+    draw_q_push(&pdm_draw_h, draw_chunk);
     __enable_irq();
 
     playbackPtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
