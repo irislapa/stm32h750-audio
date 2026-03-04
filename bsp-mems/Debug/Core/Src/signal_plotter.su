@@ -1,0 +1,8 @@
+../Core/Src/signal_plotter.c:28:6:sample_decimation	20	static
+../Core/Src/signal_plotter.c:59:6:peak_decimation	28	static
+../Core/Src/signal_plotter.c:90:6:high_res_decimation	28	static
+../Core/Src/signal_plotter.c:123:6:plot_buffer	80	static
+../Core/Src/signal_plotter.c:154:6:plot_segment	64	static
+../Core/Src/signal_plotter.c:183:6:get_snapshot	24	static,ignoring_inline_asm
+../Core/Src/signal_plotter.c:206:6:init_plotter	8	static
+../Core/Src/signal_plotter.c:233:6:signal_plotter_plot	24	static,ignoring_inline_asm

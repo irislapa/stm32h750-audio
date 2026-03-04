@@ -67,8 +67,8 @@ all: main-build
 main-build: bsp-mems.elf secondary-outputs
 
 # Tool invocations
-bsp-mems.elf bsp-mems.map: $(OBJS) $(USER_OBJS) D:\faks\rvp-1\h7-audio\bsp-mems\STM32H750XBHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "bsp-mems.elf" @"objects.list" $(USER_OBJS) -Wl,--start-group $(LIBS) -Wl,--end-group -mcpu=cortex-m7 -T"D:\faks\rvp-1\h7-audio\bsp-mems\STM32H750XBHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bsp-mems.map" -Wl,--gc-sections -static -L../Middlewares/ST/STM32_Audio/Addons/PDM/Lib --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+bsp-mems.elf bsp-mems.map: $(OBJS) $(USER_OBJS) D:\faks\stm32h750-audio\bsp-mems\STM32H750XBHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "bsp-mems.elf" @"objects.list" $(USER_OBJS) -Wl,--start-group $(LIBS) -Wl,--end-group -mcpu=cortex-m7 -T"D:\faks\stm32h750-audio\bsp-mems\STM32H750XBHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bsp-mems.map" -Wl,--gc-sections -static -L../Middlewares/ST/STM32_Audio/Addons/PDM/Lib --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

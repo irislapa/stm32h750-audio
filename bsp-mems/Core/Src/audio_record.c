@@ -18,11 +18,13 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include <draw_wave.h>
 #include "main.h"
 #include <stdio.h>
 #include "string.h"
-
+#include "adc.h"
+#include "dma.h"
+#include "tim.h"
+#include "signal_plotter.h"
 /** @addtogroup STM32H7xx_HAL_Examples
   * @{
   */
@@ -47,7 +49,7 @@ typedef enum
 #define AUDIO_BUFF_SIZE  4096
 #define AUDIO_NB_BLOCKS    ((uint32_t)4)
 
-
+#define ADC_DMA_BUFF_SIZE 1024
 #define FS_HZ            16000u
 #define REC_SEC          5u
 
@@ -67,6 +69,8 @@ ALIGN_32BYTES (uint16_t recordPDMBuf[AUDIO_IN_PDM_BUFFER_SIZE]);
 
 ALIGN_32BYTES (uint16_t  RecPlayback[AUDIO_BUFF_SIZE]);
 ALIGN_32BYTES (uint16_t  PlaybackBuffer[2*AUDIO_BUFF_SIZE]);
+ALIGN_32BYTES (uint16_t  recordADCBuff[ADC_DMA_BUFF_SIZE]);
+
 
 ALIGN_32BYTES (uint16_t copyPCMBuf[REC_SAMPLES]);
 
@@ -118,8 +122,10 @@ static int16_t g_rec_pcm[REC_SAMPLES];
 static volatile uint32_t g_rec_wr = 0;
 static volatile uint8_t  g_rec_done  = 0;
 
-draw_wave_t pdm_draw_h;
-
+//draw_wave_t hdraw_pdm;
+//draw_wave_t hdraw_adc;
+signal_plotter_handle_t hplotterADC;
+uint32_t adc_dma_write_idx = 0;
 /* Private function prototypes -----------------------------------------------*/
 //static void rec_copy_chunk(const int16_t *src, uint32_t n_samples);
 
@@ -181,7 +187,7 @@ void AudioRecord_demo(void)
 
   BSP_AUDIO_OUT_Init(0, &AudioOutInit);
 
-  init_DrawWave(&pdm_draw_h, (int16_t *) RecPlayback[0],  12, 102, x_size - 24, y_size - 114);
+  //init_DrawWavePDM(&hdraw_pdm, (int16_t *) RecPlayback[0],  12, 102, x_size - 24, y_size - 114);
   /* Start Recording */
   UTIL_LCD_DisplayStringAt(0, 190, (uint8_t *)"Start Recording ", CENTER_MODE);
   BSP_AUDIO_IN_RecordPDM(1, (uint8_t*)&recordPDMBuf, 2*AUDIO_IN_PDM_BUFFER_SIZE);
@@ -190,10 +196,26 @@ void AudioRecord_demo(void)
   UTIL_LCD_DisplayStringAt(0, 220, (uint8_t *)"Play the recorded buffer... ", CENTER_MODE);
   BSP_AUDIO_OUT_Play(0, (uint8_t*)&RecPlayback[0], 2*AUDIO_BUFF_SIZE);
 
+  MX_DMA_Init();
+  MX_TIM6_Init();
+  MX_ADC3_Init();
+  HAL_TIM_Base_Start(&htim6);
+
+  HAL_ADC_Start_DMA(&hadc3, (uint32_t*)recordADCBuff, ADC_DMA_BUFF_SIZE);
+
+  hplotterADC.input_buffer = (int16_t*)recordADCBuff;
+  hplotterADC.input_buffer_size = ADC_DMA_BUFF_SIZE;
+  hplotterADC.window.x = 12;
+  hplotterADC.window.y = 102;
+  hplotterADC.window.width = x_size - 24;
+  hplotterADC.window.height = y_size - 114;
+  hplotterADC.p_dma_write_idx = &adc_dma_write_idx;
+
+  init_plotter(&hplotterADC, (void *) NULL);
+
   while (1)
   {
-
-	 DrawWave_process(&pdm_draw_h);
+    signal_plotter_plot(&hplotterADC);
 
     if (CheckForUserInput() > 0)
     {
@@ -250,7 +272,7 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 
     /* Clean Data Cache to update the content of the SRAM */
     SCB_CleanDCache_by_Addr((uint32_t*)&RecPlayback[playbackPtr], AUDIO_IN_PDM_BUFFER_SIZE/4);
-
+/*
     int16_t *pcm_chunk = (int16_t*)&RecPlayback[playbackPtr];
 
     audio_chunk_t draw_chunk = {
@@ -260,13 +282,15 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 
     __disable_irq();
     //rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
-    draw_q_push(&pdm_draw_h, draw_chunk);
-    __enable_irq();
+    draw_q_push(&hdraw_pdm, draw_chunk);
 
     playbackPtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
     if(playbackPtr >= AUDIO_BUFF_SIZE)
-    {  playbackPtr = 0;
+    {
+    	playbackPtr = 0;
     }
+    __enable_irq();
+  */
   }
   else
   {
@@ -289,7 +313,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 
     /* Clean Data Cache to update the content of the SRAM */
     SCB_CleanDCache_by_Addr((uint32_t*)&RecPlayback[playbackPtr], AUDIO_IN_PDM_BUFFER_SIZE/4);
-
+/*
     int16_t *pcm_chunk = (int16_t*)&RecPlayback[playbackPtr];
 
     audio_chunk_t draw_chunk = {
@@ -298,21 +322,50 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 	};
     __disable_irq();
     //rec_copy_chunk(pcm_chunk, PCM_SAMPLES_PER_CB);
-    draw_q_push(&pdm_draw_h, draw_chunk);
-    __enable_irq();
+    draw_q_push(&hdraw_pdm, draw_chunk);
 
     playbackPtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
     if(playbackPtr >= AUDIO_BUFF_SIZE)
     {
       playbackPtr = 0;
     }
+    __enable_irq();
 
+*/
   }
   else
   {
     AudioBufferOffset = BUFFER_OFFSET_HALF;
   }
 }
+
+/**
+  * @brief  Conversion complete callback in non-blocking mode.
+  * @param hadc ADC handle
+  * @retval None
+  */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+    if (hadc->Instance == ADC3)
+    {
+    	// todo: make sure the index is set correctly
+    	adc_dma_write_idx = ADC_DMA_BUFF_SIZE;
+    }
+}
+
+/**
+  * @brief  Conversion DMA half-transfer callback in non-blocking mode.
+  * @param hadc ADC handle
+  * @retval None
+  */
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
+{
+    if (hadc->Instance == ADC3)
+    {
+    	adc_dma_write_idx = ADC_DMA_BUFF_SIZE/2;
+    }
+}
+
 
 /**
   * @}

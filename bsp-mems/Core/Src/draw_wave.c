@@ -8,14 +8,14 @@
 #include "main.h"
 #include "draw_wave.h"
 
-void init_DrawWave(draw_wave_t *draw_wave_h, int16_t *buffer,
+void init_DrawWavePDM(draw_wave_t *draw_wave_h, int16_t *buffer,
 		uint32_t x,
 		uint32_t y,
 		uint32_t width,
 		uint32_t height)
 {
 	draw_wave_t *h = draw_wave_h;
-	h->p_buffer = buffer;
+	h->p_buffBase= buffer;
 	h->main_win.x = x;
 	h->main_win.y = y;
 	h->main_win.width = width;
@@ -30,6 +30,27 @@ void init_DrawWave(draw_wave_t *draw_wave_h, int16_t *buffer,
 	h->draw_q.count = 0;
     h->current_x  = h->main_win.x;
     h->block_width = h->main_win.width / QUEUE_SIZE;
+}
+
+void init_DrawWaveADC(draw_wave_t *draw_wave_h, int16_t *buffer, int16_t *snapBuff, int16_t *drawBuff,
+		uint32_t x,
+		uint32_t y,
+		uint32_t width,
+		uint32_t height)
+{
+	draw_wave_t *h = draw_wave_h;
+	h->p_buffBase= buffer;
+	h->buffBaseSize = DMA_N_SAMPLES;
+	h->p_snapBuff = snapBuff;
+	h->snapBuffSize = 1024;
+	h->p_drawBuff = drawBuff;
+	h->drawBuffSize = 256;
+
+	h->main_win.x = x;
+	h->main_win.y = y;
+	h->main_win.width = width;
+	h->main_win.height = height;
+
 }
 
 void draw_q_push(draw_wave_t *draw_wave_h, audio_chunk_t chunk)
@@ -58,7 +79,7 @@ audio_chunk_t draw_q_pop(draw_wave_t *draw_wave_h)
 }
 
 
-void DrawHalfCB(audio_chunk_t *p_chunk, draw_window_t half_win)
+void DrawChunk(audio_chunk_t *p_chunk, draw_window_t half_win)
 {
 
   // clear window area
@@ -86,9 +107,8 @@ void DrawHalfCB(audio_chunk_t *p_chunk, draw_window_t half_win)
   }
 }
 
-
-
-void DrawWave_process(draw_wave_t *draw_wave_h)
+//used when audio device pushes data via callback
+void DrawWave_processCB(draw_wave_t *draw_wave_h)
 {
 	draw_wave_t *h = draw_wave_h;
 
@@ -101,7 +121,7 @@ void DrawWave_process(draw_wave_t *draw_wave_h)
 	if (chunk.data == NULL)
 		return;
 	draw_window_t halfCBWin = { .x = h->current_x, .y = h->main_win.y, .width = h->block_width, .height = h->main_win.height };
-	DrawHalfCB(&chunk, halfCBWin);
+	DrawChunk(&chunk, halfCBWin);
 
     h->current_x += h->block_width;
     // wrap around (circular)
@@ -109,7 +129,103 @@ void DrawWave_process(draw_wave_t *draw_wave_h)
     {
         h->current_x = h->main_win.x;
     }
+}
 
+void sampleDecimateADC(uint16_t *inputSamplesBuff, uint32_t n_samples, uint16_t *outputDecimatedBuff, uint32_t n_groups);
+void hrDecimateADC(uint32_t *inputSamplesBuff , uint32_t *outputDecimatedBuff);
+void peakDecimateADC(uint32_t *inputSamplesBuff , uint32_t *outputDecimatedBuff);
+void getSnapshot(uint16_t *srcBuffBase, uint32_t srcBuffSize, uint16_t *snapshotBuff, uint32_t snapshotBuffSize);
+// used when audio device continuously refills a circular buffer
+void DrawWave_processContinuous(draw_wave_t *draw_wave_h)
+{
+	draw_wave_t *h = draw_wave_h;
+
+	draw_window_t win = { .x = h->current_x, .y = h->main_win.y, .width = h->drawBuffSize, .height = h->main_win.height };
+	getSnapshot(h->p_buffBase, h->buffBaseSize, h->p_snapBuff, h->snapBuffSize);
+	sampleDecimateADC(h->p_snapBuff, h->snapBuffSize, h->p_drawBuff, h->drawBuffSize);
+	audio_chunk_t chunk;
+	chunk.data = (int16_t*)h->p_drawBuff;
+	chunk.n_samples = h->drawBuffSize;
+	DrawChunk(&chunk, win);
+}
+
+
+uint32_t *dmaWriteIdx;
+
+
+/**
+ * todo:
+ * seperates the input samples buffer into groups, and returns only the last samples of the groups
+ *
+ *
+ */
+void sampleDecimateADC(uint16_t *inputSamplesBuff, uint32_t n_samples, uint16_t *outputDecimatedBuff, uint32_t n_groups)
+{
+	if (inputSamplesBuff == NULL|| outputDecimatedBuff == NULL || n_samples == 0 || n_groups == 0)
+		return;
+
+    // Ensure the division yields an exact integer step
+    if (n_samples % n_groups != 0) {
+        // Handle error (e.g., return early, adjust n_groups, or pad input)
+        return;
+    }
+
+    uint32_t step = n_samples / n_groups;
+
+    for (uint32_t i = 0; i < n_groups; i++)
+    {
+    	if (i * step >= n_samples) {
+    		return; // Prevent out-of-bounds access
+    	}
+        outputDecimatedBuff[i] = inputSamplesBuff[i * step];
+    }
+}
+/**
+ * todo:
+ * seperates the input samples buffer into groups, and returns average sample values of the groups
+ */
+void hrDecimateADC(uint32_t *inputSamplesBuff , uint32_t *outputDecimatedBuff)
+{
+	return;
 
 }
 
+/**
+ * todo:
+ * seperates the input samples buffer into groups, finds the largest and lowest sample value of each group, and returns them
+ */
+void peakDecimateADC(uint32_t *inputSamplesBuff , uint32_t *outputDecimatedBuff)
+{
+	return;
+}
+
+
+/**
+ * todo:
+ * returns the last N samples from the dma circular buffer
+ */
+extern DMA_HandleTypeDef hdma_adc3;
+void getSnapshot(uint16_t *srcBuffBase, uint32_t srcBuffSize, uint16_t *snapshotBuff, uint32_t snapshotBuffSize)
+{
+	// Can't get more samples than the buffer holds
+	if (snapshotBuffSize > srcBuffSize) {
+		return;
+	}
+
+	uint32_t srcIdx = srcBuffSize - __HAL_DMA_GET_COUNTER(&hdma_adc3);
+
+	uint32_t start = (srcIdx - snapshotBuffSize + srcBuffSize) % srcBuffSize;
+
+	uint32_t firstChunk = srcBuffSize - start;
+	if (firstChunk >= snapshotBuffSize) {
+		// If the start index is smaller srcBuffSize - snapshotBufferSize samples are copied in 1 chunk
+		memcpy(snapshotBuff, &srcBuffBase[start], snapshotBuffSize * sizeof(uint16_t));
+	} else {
+		// If it goes over the edge, samples are copied in 2 chunks
+		uint32_t secondChunk = snapshotBuffSize - firstChunk;
+		memcpy(snapshotBuff, &srcBuffBase[start], firstChunk * sizeof(uint16_t));
+		memcpy(&snapshotBuff[firstChunk], srcBuffBase, secondChunk * sizeof(uint16_t));
+	}
+
+
+}

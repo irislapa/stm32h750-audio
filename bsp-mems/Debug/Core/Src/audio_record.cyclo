@@ -1,4 +1,6 @@
-../Core/Src/audio_record.c:139:6:AudioRecord_demo	2
-../Core/Src/audio_record.c:232:10:get_g_rec_wr	1
-../Core/Src/audio_record.c:242:6:BSP_AUDIO_IN_TransferComplete_CallBack	4
-../Core/Src/audio_record.c:281:6:BSP_AUDIO_IN_HalfTransfer_CallBack	4
+../Core/Src/audio_record.c:145:6:AudioRecord_demo	2
+../Core/Src/audio_record.c:254:10:get_g_rec_wr	1
+../Core/Src/audio_record.c:264:6:BSP_AUDIO_IN_TransferComplete_CallBack	4
+../Core/Src/audio_record.c:305:6:BSP_AUDIO_IN_HalfTransfer_CallBack	4
+../Core/Src/audio_record.c:347:6:HAL_ADC_ConvCpltCallback	2
+../Core/Src/audio_record.c:361:6:HAL_ADC_ConvHalfCpltCallback	2
