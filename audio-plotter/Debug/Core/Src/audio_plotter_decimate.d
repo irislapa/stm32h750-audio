@@ -1,4 +1,5 @@
-Core/Src/audio_play.o: ../Core/Src/audio_play.c ../Core/Inc/main.h \
+Core/Src/audio_plotter_decimate.o: ../Core/Src/audio_plotter_decimate.c \
+ ../Core/Inc/audio_plotter.h ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
@@ -67,6 +68,7 @@ Core/Src/audio_play.o: ../Core/Src/audio_play.c ../Core/Inc/main.h \
  ../Drivers/BSP/STM32H750B-DK/../Components/mt48lc4m32b2/mt48lc4m32b2.h \
  ../Core/Inc/mt48lc4m32b2_conf.h ../Utilities/lcd/stm32_lcd.h \
  ../Utilities/Fonts/fonts.h
+../Core/Inc/audio_plotter.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 ../Core/Inc/stm32h7xx_hal_conf.h:

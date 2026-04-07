@@ -1,40 +1,48 @@
 /**
   ******************************************************************************
-  * @file    BSP/Src/record_mems.c
+  * @file    BSP/Src/plot_mems.c
   * @brief   Audio record demo using MEMS PDM.
   ******************************************************************************
   */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
+#include "string.h"
+#include "audio_plotter.h"
+#include "plot_err.h"
 
 /* Parameters ----------------------------------------------------------------*/
 #define AUDIO_SAMPLE_RATE_HZ        16000U
 #define AUDIO_VOLUME               40U
 #define AUDIO_IN_PDM_BUFFER_SIZE   ((uint32_t)(128U * AUDIO_SAMPLE_RATE_HZ / 16000U * 2U))
-#define AUDIO_PLAYBACK_BUFFER_SIZE 4096U
+#define AUDIO_PCM_BUFFER_SIZE 4096U
 
 /* DMA buffer ---------------------------------------------------------------*/
 #if defined ( __CC_ARM )
-  ALIGN_32BYTES (uint16_t recordPDMBuf[AUDIO_IN_PDM_BUFFER_SIZE]) __attribute__((section(".RAM_D3")));
+  ALIGN_32BYTES (uint16_t recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE]) __attribute__((section(".RAM_D3")));
 #elif defined ( __ICCARM__ )
 #pragma location=0x38000000
-ALIGN_32BYTES (uint16_t recordPDMBuf[AUDIO_IN_PDM_BUFFER_SIZE]);
+ALIGN_32BYTES (uint16_t recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE]);
 #elif defined ( __GNUC__ )
-  ALIGN_32BYTES (uint16_t recordPDMBuf[AUDIO_IN_PDM_BUFFER_SIZE]) __attribute__((section(".RAM_D3")));
+  ALIGN_32BYTES (uint16_t recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE]) __attribute__((section(".RAM_D3")));
 #endif
 
-ALIGN_32BYTES (uint16_t recordPCMBuff[AUDIO_PLAYBACK_BUFFER_SIZE]);
+ALIGN_32BYTES (uint16_t recordPCMBuff[AUDIO_PCM_BUFFER_SIZE]);
+uint32_t pcmWritePtr = 0;
 
 extern uint32_t channel_nbr;
 extern __IO uint32_t ButtonState;
 extern uint8_t CheckForUserInput(void);
 
+static audio_plotter_handle_t hplot_mems;
+
+
 /**
   * @brief  Audio Record demo using MEMS PDM.
   * @retval None
   */
-void AudioRecordMems(void)
+void PlotMemsDemo(void)
 {
   uint32_t x_size, y_size;
   BSP_AUDIO_Init_t audio_in;
@@ -51,7 +59,6 @@ void AudioRecordMems(void)
   UTIL_LCD_SetFont(&Font24);
   UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *)"MEMS PDM RECORD PLOTTER", CENTER_MODE);
   UTIL_LCD_SetFont(&Font16);
-  UTIL_LCD_DisplayStringAt(0, 24, (uint8_t *)"Make sure the SW2 is in position PDM ", CENTER_MODE);
   UTIL_LCD_DisplayStringAt(0, 40, (uint8_t *)"Press User button to stop", CENTER_MODE);
 
   /* Plot frame */
@@ -69,8 +76,22 @@ void AudioRecordMems(void)
   UTIL_LCD_DisplayStringAt(0, 190, (uint8_t *)"Start Recording ", CENTER_MODE);
   BSP_AUDIO_IN_RecordPDM(1, (uint8_t*)&recordPDMBuff, 2U * AUDIO_IN_PDM_BUFFER_SIZE);
 
+
+  hplot_mems.decimate.audio_source = AUDIO_SOURCE_MEMS;
+  hplot_mems.decimate.buffer = (int16_t *) recordPCMBuff;
+  hplot_mems.decimate.buffer_size = AUDIO_PCM_BUFFER_SIZE;
+  hplot_mems.decimate.dma_wr = pcmWritePtr;
+  hplot_mems.main_window.x = 12;
+  hplot_mems.main_window.y = 102;
+  hplot_mems.main_window.width = x_size - 24;
+  hplot_mems.main_window.height = y_size - 114;
+
+  init_plotter(&hplot_mems);
+
+
   while (1)
   {
+	plot_audio(&hplot_mems);
     if (CheckForUserInput() > 0)
     {
       ButtonState = 0;
@@ -97,10 +118,20 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 
   BSP_AUDIO_IN_PDMToPCM(Instance,
                         (uint16_t*)&recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE / 2U],
-                        &recordPCMBuff[0]);
+                        &recordPCMBuff[pcmWritePtr]);
 
-  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[0],
+  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[pcmWritePtr],
                           AUDIO_IN_PDM_BUFFER_SIZE / 4U);
+
+  pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
+  if(pcmWritePtr >= AUDIO_PCM_BUFFER_SIZE)
+  {
+	  pcmWritePtr = 0;
+  }
+
+  hplot_mems.decimate.dma_transfer = DMA_TRANSFER_COMPLETE;
+  hplot_mems.decimate.dma_wr = pcmWritePtr;
+  hplot_mems.decimate.plot_flag = 1;
 }
 
 /**
@@ -119,8 +150,19 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 
   BSP_AUDIO_IN_PDMToPCM(Instance,
                         (uint16_t*)&recordPDMBuff[0],
-                        &recordPCMBuff[0]);
+                        &recordPCMBuff[pcmWritePtr]);
 
-  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[0],
+  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[pcmWritePtr],
                           AUDIO_IN_PDM_BUFFER_SIZE / 4U);
+
+  pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
+  if(pcmWritePtr >= AUDIO_PCM_BUFFER_SIZE)
+  {
+	  pcmWritePtr = 0;
+  }
+
+  hplot_mems.decimate.dma_transfer = DMA_TRANSFER_HALF;
+  hplot_mems.decimate.dma_wr = pcmWritePtr;
+  hplot_mems.decimate.plot_flag = 1;
+
 }

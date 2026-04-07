@@ -313,7 +313,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 
     /* Clean Data Cache to update the content of the SRAM */
     SCB_CleanDCache_by_Addr((uint32_t*)&RecPlayback[playbackPtr], AUDIO_IN_PDM_BUFFER_SIZE/4);
-/*
+
     int16_t *pcm_chunk = (int16_t*)&RecPlayback[playbackPtr];
 
     audio_chunk_t draw_chunk = {
@@ -331,7 +331,7 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
     }
     __enable_irq();
 
-*/
+
   }
   else
   {

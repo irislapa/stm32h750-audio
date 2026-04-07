@@ -7,13 +7,14 @@
 C_SRCS += \
 ../Core/Src/adc.c \
 ../Core/Src/app_timers.c \
-../Core/Src/audio_play.c \
 ../Core/Src/audio_plotter.c \
+../Core/Src/audio_plotter_decimate.c \
+../Core/Src/audio_plotter_draw.c \
 ../Core/Src/dma.c \
 ../Core/Src/main.c \
 ../Core/Src/measureCycles.c \
-../Core/Src/record_adc.c \
-../Core/Src/record_mems.c \
+../Core/Src/plot_adc.c \
+../Core/Src/plot_mems.c \
 ../Core/Src/stm32h7xx_it.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
@@ -23,13 +24,14 @@ C_SRCS += \
 OBJS += \
 ./Core/Src/adc.o \
 ./Core/Src/app_timers.o \
-./Core/Src/audio_play.o \
 ./Core/Src/audio_plotter.o \
+./Core/Src/audio_plotter_decimate.o \
+./Core/Src/audio_plotter_draw.o \
 ./Core/Src/dma.o \
 ./Core/Src/main.o \
 ./Core/Src/measureCycles.o \
-./Core/Src/record_adc.o \
-./Core/Src/record_mems.o \
+./Core/Src/plot_adc.o \
+./Core/Src/plot_mems.o \
 ./Core/Src/stm32h7xx_it.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
@@ -39,13 +41,14 @@ OBJS += \
 C_DEPS += \
 ./Core/Src/adc.d \
 ./Core/Src/app_timers.d \
-./Core/Src/audio_play.d \
 ./Core/Src/audio_plotter.d \
+./Core/Src/audio_plotter_decimate.d \
+./Core/Src/audio_plotter_draw.d \
 ./Core/Src/dma.d \
 ./Core/Src/main.d \
 ./Core/Src/measureCycles.d \
-./Core/Src/record_adc.d \
-./Core/Src/record_mems.d \
+./Core/Src/plot_adc.d \
+./Core/Src/plot_mems.d \
 ./Core/Src/stm32h7xx_it.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \
@@ -60,7 +63,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/app_timers.cyclo ./Core/Src/app_timers.d ./Core/Src/app_timers.o ./Core/Src/app_timers.su ./Core/Src/audio_play.cyclo ./Core/Src/audio_play.d ./Core/Src/audio_play.o ./Core/Src/audio_play.su ./Core/Src/audio_plotter.cyclo ./Core/Src/audio_plotter.d ./Core/Src/audio_plotter.o ./Core/Src/audio_plotter.su ./Core/Src/dma.cyclo ./Core/Src/dma.d ./Core/Src/dma.o ./Core/Src/dma.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/measureCycles.cyclo ./Core/Src/measureCycles.d ./Core/Src/measureCycles.o ./Core/Src/measureCycles.su ./Core/Src/record_adc.cyclo ./Core/Src/record_adc.d ./Core/Src/record_adc.o ./Core/Src/record_adc.su ./Core/Src/record_mems.cyclo ./Core/Src/record_mems.d ./Core/Src/record_mems.o ./Core/Src/record_mems.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su ./Core/Src/tim.cyclo ./Core/Src/tim.d ./Core/Src/tim.o ./Core/Src/tim.su
+	-$(RM) ./Core/Src/adc.cyclo ./Core/Src/adc.d ./Core/Src/adc.o ./Core/Src/adc.su ./Core/Src/app_timers.cyclo ./Core/Src/app_timers.d ./Core/Src/app_timers.o ./Core/Src/app_timers.su ./Core/Src/audio_plotter.cyclo ./Core/Src/audio_plotter.d ./Core/Src/audio_plotter.o ./Core/Src/audio_plotter.su ./Core/Src/audio_plotter_decimate.cyclo ./Core/Src/audio_plotter_decimate.d ./Core/Src/audio_plotter_decimate.o ./Core/Src/audio_plotter_decimate.su ./Core/Src/audio_plotter_draw.cyclo ./Core/Src/audio_plotter_draw.d ./Core/Src/audio_plotter_draw.o ./Core/Src/audio_plotter_draw.su ./Core/Src/dma.cyclo ./Core/Src/dma.d ./Core/Src/dma.o ./Core/Src/dma.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/measureCycles.cyclo ./Core/Src/measureCycles.d ./Core/Src/measureCycles.o ./Core/Src/measureCycles.su ./Core/Src/plot_adc.cyclo ./Core/Src/plot_adc.d ./Core/Src/plot_adc.o ./Core/Src/plot_adc.su ./Core/Src/plot_mems.cyclo ./Core/Src/plot_mems.d ./Core/Src/plot_mems.o ./Core/Src/plot_mems.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su ./Core/Src/tim.cyclo ./Core/Src/tim.d ./Core/Src/tim.o ./Core/Src/tim.su
 
 .PHONY: clean-Core-2f-Src
 

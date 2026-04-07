@@ -1,31 +1,37 @@
 /**
   ******************************************************************************
-  * @file    BSP/Src/record_adc.c
+  * @file    BSP/Src/plot_adc.c
   * @brief   Audio record demo using ADC + DMA.
   ******************************************************************************
   */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
+#include "string.h"
 #include "adc.h"
 #include "dma.h"
 #include "tim.h"
 #include "audio_plotter.h"
 
 /* Parameters ----------------------------------------------------------------*/
-#define ADC_DMA_BUFFER_SIZE 1024U
+#define ADC_DMA_BUFFER_SIZE 256U
 
 /* DMA buffers ---------------------------------------------------------------*/
 ALIGN_32BYTES (uint16_t adcDmaBuffer[ADC_DMA_BUFFER_SIZE]);
 
-static audio_plotter_handle_t hplotter_adc;
-static volatile uint32_t adc_dma_write_idx = 0;
+static audio_plotter_handle_t hplot_adc;
+
+
+extern uint32_t channel_nbr;
+extern __IO uint32_t ButtonState;
+extern uint8_t CheckForUserInput(void);
 
 /**
   * @brief  ADC record demo with waveform plotter.
   * @retval None
   */
-void AudioRecordADC_demo(void)
+void PlotADC_demo(void)
 {
   uint32_t x_size, y_size;
 
@@ -53,19 +59,19 @@ void AudioRecordADC_demo(void)
   HAL_TIM_Base_Start(&htim6);
   HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adcDmaBuffer, ADC_DMA_BUFFER_SIZE);
 
-  hplotter_adc.input_buffer = (int16_t*)adcDmaBuffer;
-  hplotter_adc.input_buffer_size = ADC_DMA_BUFFER_SIZE;
-  hplotter_adc.window.x = 12;
-  hplotter_adc.window.y = 102;
-  hplotter_adc.window.width = x_size - 24;
-  hplotter_adc.window.height = y_size - 114;
-  hplotter_adc.p_dma_write_idx = (uint32_t *)&adc_dma_write_idx;
+  hplot_adc.decimate.audio_source = AUDIO_SOURCE_ADC;
+  hplot_adc.decimate.buffer = (uint16_t*)adcDmaBuffer;
+  hplot_adc.decimate.buffer_size = ADC_DMA_BUFFER_SIZE;
+  hplot_adc.main_window.x = 12;
+  hplot_adc.main_window.y = 102;
+  hplot_adc.main_window.width = x_size - 24;
+  hplot_adc.main_window.height = y_size - 114;
 
-  init_plotter(&plotter_adc, (void *)NULL);
+  init_plotter(&hplot_adc);
 
   while (1)
   {
-    signal_plotter_plot(&plotter_adc);
+    plot_audio(&hplot_adc);
 
     if (CheckForUserInput() > 0)
     {
@@ -86,8 +92,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC3)
   {
-    hplotter_adc.transfer_dma = DMA_TRANSFER_COMPLETE;
-    hplotter_adc.dma_write_idx = ADC_DMA_BUFFER_SIZE;
+    hplot_adc.decimate.dma_transfer = DMA_TRANSFER_COMPLETE;
+    hplot_adc.decimate.dma_wr = ADC_DMA_BUFFER_SIZE;
+    hplot_adc.decimate.plot_flag = 1;
   }
 }
 
@@ -100,7 +107,8 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC3)
   {
-    hplotter_adc.transfer_dma = DMA_TRANSFER_HALF;
-    hplotter_adc.dma_write_idx = ADC_DMA_BUFFER_SIZE / 2U;
+    hplot_adc.decimate.dma_transfer = DMA_TRANSFER_HALF;
+    hplot_adc.decimate.dma_wr = ADC_DMA_BUFFER_SIZE / 2U;
+    hplot_adc.decimate.plot_flag = 1;
   }
 }

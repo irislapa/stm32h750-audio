@@ -1,0 +1,5 @@
+../Core/Src/audio_plotter.c:17:6:init_plotter	0	static,ignoring_inline_asm
+../Core/Src/audio_plotter.c:41:6:plot_adc	0	static
+../Core/Src/audio_plotter.c:47:6:plot_mems	0	static
+../Core/Src/audio_plotter.c:55:6:plot_audio	16	static,ignoring_inline_asm
+../Core/Src/audio_plotter.c:68:6:error_handler	0	static,ignoring_inline_asm

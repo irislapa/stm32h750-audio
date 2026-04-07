@@ -147,7 +147,10 @@ int main(void)
 
 
   //AudioPlay_demo();
-  AudioRecord_demo();
+  //AudioRecord_demo();
+  //PlotADC_demo();
+  PlotMemsDemo();
+
   while (1)
   {
 	  if (CheckForUserInput() > 0)
@@ -156,7 +159,7 @@ int main(void)
 		break;
 	  }
   }
-  AudioPlay_demo();
+  //AudioPlay_demo();
   /* Wait For User inputs */
   while (1)
   {
