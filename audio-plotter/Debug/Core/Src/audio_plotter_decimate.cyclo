@@ -1,6 +1,6 @@
-../Core/Src/audio_plotter_decimate.c:11:6:plotter_queue_push	2
-../Core/Src/audio_plotter_decimate.c:30:17:plotter_queue_pop	2
-../Core/Src/audio_plotter_decimate.c:50:6:sample_decimate	4
-../Core/Src/audio_plotter_decimate.c:77:6:peak_decimate	11
-../Core/Src/audio_plotter_decimate.c:112:6:avg_decimate	12
-../Core/Src/audio_plotter_decimate.c:161:6:decimate	4
+../Core/Src/audio_plotter_decimate.c:11:6:plotter_queue_push	3
+../Core/Src/audio_plotter_decimate.c:26:17:plotter_queue_pop	3
+../Core/Src/audio_plotter_decimate.c:46:6:sample_decimate	7
+../Core/Src/audio_plotter_decimate.c:73:6:peak_decimate	11
+../Core/Src/audio_plotter_decimate.c:104:6:avg_decimate	9
+../Core/Src/audio_plotter_decimate.c:128:6:decimate	10

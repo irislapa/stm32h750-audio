@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    BSP/Src/plot_mems.c
+  * @file    audio-plotter/Core/Src/plot_mems.c
   * @brief   Audio record demo using MEMS PDM.
   ******************************************************************************
   */
@@ -129,9 +129,18 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 	  pcmWritePtr = 0;
   }
 
+  __disable_irq();
   hplot_mems.decimate.dma_transfer = DMA_TRANSFER_COMPLETE;
   hplot_mems.decimate.dma_wr = pcmWritePtr;
   hplot_mems.decimate.plot_flag = 1;
+
+  audio_segment_t seg = {
+    .p_samples = (int16_t *)&recordPCMBuff[pcmWritePtr],
+    .n_samples = AUDIO_IN_PDM_BUFFER_SIZE / 4 / 2
+  };
+  plotter_queue_push(&hplot_mems, seg);
+  __enable_irq();
+
 }
 
 /**
@@ -161,8 +170,16 @@ void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 	  pcmWritePtr = 0;
   }
 
+  __disable_irq();
   hplot_mems.decimate.dma_transfer = DMA_TRANSFER_HALF;
   hplot_mems.decimate.dma_wr = pcmWritePtr;
   hplot_mems.decimate.plot_flag = 1;
+
+  audio_segment_t seg = {
+    .p_samples = (uint16_t *)&recordPCMBuff[pcmWritePtr],
+    .n_samples = AUDIO_IN_PDM_BUFFER_SIZE / 4 / 2
+  };
+  plotter_queue_push(&hplot_mems, seg);
+  __enable_irq();
 
 }

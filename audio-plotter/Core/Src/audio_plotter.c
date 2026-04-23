@@ -10,10 +10,13 @@
 
 
 #ifndef PLOT_BUFF_SIZE
-#define PLOT_BUFF_SIZE 100
+#define PLOT_BUFF_SIZE 50
 #endif
 
-// todo: define the init funciton
+int16_t plot_buff[PLOT_BUFF_SIZE];
+
+
+// todo: define default setup
 void init_plotter(audio_plotter_handle_t *h)
 {
 	if (!h) {
@@ -23,10 +26,17 @@ void init_plotter(audio_plotter_handle_t *h)
 	if (h->decimate.audio_source == AUDIO_SOURCE_ADC)
 	{
 		h->decimate.dma_wr = 0;
+		h->plot.buffer = &plot_buff;
+		h->plot.buffer_size = PLOT_BUFF_SIZE;
 	}
 	else if (h->decimate.audio_source == AUDIO_SOURCE_MEMS)
 	{
-		h->decimate.queue.size = QUEUE_SIZE;
+		h->decimate.dma_wr = 0;
+		h->plot.buffer = &plot_buff;
+		h->plot.buffer_size = PLOT_BUFF_SIZE;
+		h->decimate.queue.size = AUDIO_QUEUE_SIZE;
+		h->decimate.queue.r = 0;
+		h->decimate.queue.wr = 0;
 
 	}
 	else
@@ -36,8 +46,9 @@ void init_plotter(audio_plotter_handle_t *h)
 	}
 }
 
+//todo: implement n_buffers, and n_polls
 
-//todo: am i plotting n_buffers, half-half buffer, or am i polling n samples
+//todo: what am i plotting? n_buffers, half-half buffer, or am i polling n samples
 void plot_adc(audio_plotter_handle_t *h)
 {
   plot_buffer(h, h->plot.buffer, h->plot.buffer_size);
@@ -61,10 +72,18 @@ void plot_audio(audio_plotter_handle_t *h)
   SCB_InvalidateDCache_by_Addr((uint32_t *)h->decimate.buffer, h->decimate.buffer_size * sizeof(uint16_t));
   decimate(h, SAMPLE_DECIMATION);
   plot_buffer(h, h->plot.buffer, h->plot.buffer_size);
+  
   uint32_t t1 = DWT_GetCycles();
   n_cycles = t1 - t0;
 }
 
+
+
+
+
+
+
+/*=========== error handler for fatal errors in plotter code ============ */
 void error_handler(uint32_t error_code)
 {
     __disable_irq();

@@ -67,8 +67,8 @@ Core/Src/audio_plotter.o: ../Core/Src/audio_plotter.c \
  ../Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.h \
  ../Drivers/BSP/STM32H750B-DK/../Components/mt48lc4m32b2/mt48lc4m32b2.h \
  ../Core/Inc/mt48lc4m32b2_conf.h ../Utilities/lcd/stm32_lcd.h \
- ../Utilities/Fonts/fonts.h ../Core/Inc/measureCycles.h \
- ../Core/Inc/plot_err.h
+ ../Utilities/Fonts/fonts.h ../Core/Inc/plot_err.h \
+ ../Core/Inc/measureCycles.h ../Core/Inc/plot_err.h
 ../Core/Inc/audio_plotter.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -140,5 +140,6 @@ Core/Src/audio_plotter.o: ../Core/Src/audio_plotter.c \
 ../Core/Inc/mt48lc4m32b2_conf.h:
 ../Utilities/lcd/stm32_lcd.h:
 ../Utilities/Fonts/fonts.h:
+../Core/Inc/plot_err.h:
 ../Core/Inc/measureCycles.h:
 ../Core/Inc/plot_err.h:

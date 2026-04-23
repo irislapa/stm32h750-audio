@@ -11,19 +11,19 @@
 #include <stdint.h>
 #include <limits.h>
 #include "main.h"
+#include "plot_err.h"
 
-#define RANGE_16_BIT 32768
-#define DMA_TRANSFER_HALF 0
-#define DMA_TRANSFER_COMPLETE 1
+#define DMA_TRANSFER_HALF 0u
+#define DMA_TRANSFER_COMPLETE 1u
 
-#define AUDIO_SOURCE_ADC 0
-#define AUDIO_SOURCE_MEMS 1
+#define AUDIO_SOURCE_ADC 0u
+#define AUDIO_SOURCE_MEMS 1u
 
-#define SAMPLE_DECIMATION 0
-#define PEAK_DECIMATION 1
-#define AVG_DECIMATION 2
+#define SAMPLE_DECIMATION 0u
+#define PEAK_DECIMATION 1u
+#define AVG_DECIMATION 2u
 
-#define QUEUE_SIZE 4
+#define AUDIO_QUEUE_SIZE 16u
 
 typedef struct {
   int16_t *p_samples;
@@ -31,8 +31,8 @@ typedef struct {
 } audio_segment_t;
 
 typedef struct {
+  audio_segment_t buffer[AUDIO_QUEUE_SIZE];
   uint16_t size;
-  audio_segment_t q[QUEUE_SIZE];
   uint16_t wr; //where to push
   uint16_t r;  //where to pop
   uint16_t count;
@@ -70,12 +70,6 @@ typedef struct {
 } audio_plotter_handle_t;
 
 
-void sample_decimate(const uint16_t *p_buff_in, uint32_t in_size, uint32_t dma_idx,
-		uint32_t dc_offset, int16_t *p_buff_out, uint32_t out_size);
-void peak_decimate(const uint16_t *p_buff_in, uint32_t in_size, uint32_t dma_idx,
-		uint32_t dc_offset, int16_t *p_buff_out, uint32_t out_size);
-void avg_decimate(const uint16_t *p_buff_in, uint32_t in_size, uint32_t dma_idx,
-		uint32_t dc_offset, int16_t *p_buff_out, uint32_t out_size);
 void decimate(audio_plotter_handle_t *h, uint32_t decimation_method);
 
 void plot_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w);

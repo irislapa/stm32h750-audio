@@ -87,21 +87,19 @@ void plot_buffer(audio_plotter_handle_t *h,int16_t *buff, uint32_t buffSize)
   h->plot.window.width = h->main_window.width/2;
   h->plot.window.height = h->main_window.height;
 
-  SCB_InvalidateDCache_by_Addr((uint32_t *)h->decimate.buffer, h->decimate.buffer_size * sizeof(uint16_t));
   decimate(h, SAMPLE_DECIMATION);
 
   if (h->decimate.dma_transfer == DMA_TRANSFER_HALF)
   {
     h->plot.window.x = h->main_window.x;
-    plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
-    //plot_segment_minmax(h->plot.buffer, h->plot.buffer_size, h->plot.window);
   }
   else if (h->decimate.dma_transfer == DMA_TRANSFER_COMPLETE)
   {
-    h->plot.window.x = h->main_window.width/2 + h->main_window.x;
-    plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
-    //plot_segment_minmax(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+    h->plot.window.x = h->main_window.x + h->main_window.width/2;
   }
+  plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+  //plot_segment_minmax(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+
 }
 
 
