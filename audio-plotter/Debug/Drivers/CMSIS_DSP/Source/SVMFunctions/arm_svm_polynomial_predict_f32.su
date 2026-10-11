@@ -1,0 +1,2 @@
+../Drivers/CMSIS_DSP/Include/dsp/svm_functions.h:63:27:arm_exponent_f32	24	static
+../Drivers/CMSIS_DSP/Source/SVMFunctions/arm_svm_polynomial_predict_f32.c:461:24:arm_svm_polynomial_predict_f32	56	static

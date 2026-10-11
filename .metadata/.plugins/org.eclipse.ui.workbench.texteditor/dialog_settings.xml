@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<item key="replaceBarOpen" value="false"/>
+	<list key="searchhistory">
+		<item value="fft_instance"/>
+		<item value="float32"/>
+		<item value="float16"/>
+		<item value="input_fft"/>
+		<item value="arm_cmplx_mag_f32"/>
+	</list>
+</section>

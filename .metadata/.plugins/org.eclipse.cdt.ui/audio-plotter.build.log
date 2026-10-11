@@ -1,0 +1,30 @@
+23:03:27 **** Incremental Build of configuration Debug for project audio-plotter ****
+make -j24 all 
+arm-none-eabi-gcc "../Core/Src/audio_plotter.c" -mcpu=cortex-m7 -std=gnu11 -g -DDEBUG -DUSE_HAL_DRIVER -DSTM32H750xx -c -I../Core/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc -I../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I../Drivers/CMSIS/Include -I../PDM2PCM/App -I../Middlewares/ST/STM32_Audio/Addons/PDM/Inc -I../Drivers/CMSIS_DSP/Include -I../Drivers/CMSIS_DSP/Include/dsp -I../Drivers/CMSIS_DSP/PrivateInclude -I../Drivers/BSP/STM32H750B-DK -I/bsp-mems/Drivers/BSP -I../Utilities/lcd -I../Utilities/CPU -I../Drivers/BSP/Components/Common -I../Utilities/Fonts -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/audio_plotter.d" -MT"Core/Src/audio_plotter.o" --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -o "Core/Src/audio_plotter.o"
+../Core/Src/audio_plotter.c: In function 'copy_fft':
+../Core/Src/audio_plotter.c:83:19: warning: unused variable 'x' [-Wunused-variable]
+   83 |         float32_t x = fft_in[0];
+      |                   ^
+../Core/Src/audio_plotter.c: In function 'draw_audio_signal':
+../Core/Src/audio_plotter.c:134:3: warning: implicit declaration of function 'draw_spectogram' [-Wimplicit-function-declaration]
+  134 |   draw_spectogram(h, fft_mag_out, h->main_window);
+      |   ^~~~~~~~~~~~~~~
+../Core/Src/audio_plotter.c: In function 'error_handler':
+../Core/Src/audio_plotter.c:148:14: warning: unused variable 'code' [-Wunused-variable]
+  148 |     uint32_t code = error_code;
+      |              ^~~~
+arm-none-eabi-gcc -o "audio-plotter.elf" @"objects.list"  -Wl,--start-group -l:libPDMFilter_CM7_GCC_wc32.a -l:libPDMFilter_CM7_IAR_wc32.a -Wl,--end-group -mcpu=cortex-m7 -T"/home/irinej/faks/audio-plotter-dsp/audio-plotter/STM32H750XBHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="audio-plotter.map" -Wl,--gc-sections -static -L../Middlewares/ST/STM32_Audio/Addons/PDM/Lib --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+/opt/st/stm32cubeide_2.0.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.linux64_1.0.100.202509120712/tools/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/bin/ld: warning: audio-plotter.elf has a LOAD segment with RWX permissions
+Finished building target: audio-plotter.elf
+ 
+arm-none-eabi-size  audio-plotter.elf 
+arm-none-eabi-objdump -h -S audio-plotter.elf  > "audio-plotter.list"
+   text	   data	    bss	    dec	    hex	filename
+ 106548	    532	  18144	 125224	  1e928	audio-plotter.elf
+Finished building: default.size.stdout
+ 
+Finished building: audio-plotter.list
+ 
+
+23:03:28 Build Finished. 0 errors, 4 warnings. (took 769ms)
+

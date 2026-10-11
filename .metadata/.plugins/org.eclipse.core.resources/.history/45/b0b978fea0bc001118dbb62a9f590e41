@@ -1,0 +1,147 @@
+/*
+ * audio_plotter_draw.c
+ *
+ *  Created on: 19 Mar 2026
+ *      Author: irinej
+ */
+
+#include "audio_plotter.h"
+
+uint8_t toggle = 0;
+
+
+
+void draw_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w)
+{
+    if (!seg || seg_size == 0 || w.width == 0 || w.height == 0) return;
+
+    UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
+
+    const int32_t mid = (int32_t)w.y + (int32_t)w.height / 2;
+    int32_t yp = mid;
+    uint32_t xp = w.x;
+
+    for (uint32_t px = 0; px < w.width; px++)
+    {
+        uint32_t i = (uint32_t)(((uint64_t)px * (seg_size - 1)) / (w.width - 1));
+
+        int32_t s = seg[i];
+        int32_t y = mid - (s * (int32_t)(w.height / 2)) / INT16_MAX;
+
+        if (y < (int32_t)w.y) y = (int32_t)w.y;
+        if (y > (int32_t)(w.y + w.height - 1)) y = (int32_t)(w.y + w.height - 1);
+
+        uint32_t x = w.x + px;
+        if (px == 0) {
+            UTIL_LCD_SetPixel(x, (uint32_t)y, UTIL_LCD_COLOR_BLUE);
+        } else {
+            UTIL_LCD_DrawLine(xp, (uint32_t)yp, x, (uint32_t)y, UTIL_LCD_COLOR_BLUE);
+        }
+        xp = x;
+        yp = y;
+    }
+}
+
+
+void draw_segment_minmax(const int16_t *seg, uint32_t seg_size, draw_window_t w)
+{
+    if (!seg || (seg_size < 2) || (seg_size & 1u)) return;
+
+    UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
+
+    const int32_t mid = (int32_t)w.y + (int32_t)w.height / 2;
+    uint32_t n_pairs = seg_size / 2u;
+
+    for (uint32_t px = 0; px < w.width; px+=2)
+    {
+        uint32_t g = (uint32_t)(((uint64_t)px * (n_pairs - 1u)) / (w.width - 1u));
+
+        int32_t mn = seg[2*g];
+        int32_t mx = seg[2*g + 1u];
+
+        int32_t y1 = mid - (mn * (int32_t)(w.height/2)) / INT16_MAX;
+        int32_t y2 = mid - (mx * (int32_t)(w.height/2)) / INT16_MAX;
+
+        if (y1 < (int32_t)w.y) y1 = (int32_t)w.y;
+        if (y1 > (int32_t)(w.y + w.height - 1)) y1 = (int32_t)(w.y + w.height - 1);
+        if (y2 < (int32_t)w.y) y2 = (int32_t)w.y;
+        if (y2 > (int32_t)(w.y + w.height - 1)) y2 = (int32_t)(w.y + w.height - 1);
+
+        if (y1 > y2) { int32_t t=y1; y1=y2; y2=t; } // ensure y1 is top
+
+        uint32_t x = w.x + px;
+        UTIL_LCD_DrawLine(x, (uint32_t)y1, x, (uint32_t)y2, UTIL_LCD_COLOR_BLUE);
+    }
+}
+
+void draw_spectogram(audio_plotter_handle_t *h, float32_t ** data, draw_window_t w)
+{
+    UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
+
+    for (uint32_t px = 0; px < w.width/2; px++)
+	{
+		uint32_t idx = (uint32_t)((px * (h->fft.data_size - 1u)) / (w.width/2 - 1u));
+		int32_t val = h->fft.mag_data[idx];
+
+		int32_t bar_height = (val * (int32_t)w.height) / INT16_MAX;
+		if (bar_height < 0) bar_height = 0;
+		if (bar_height > (int32_t)w.height) bar_height = (int32_t)w.height;
+
+		int32_t y_start = (int32_t)w.y + (int32_t)w.height - bar_height;
+		uint32_t x = w.x + px;
+
+		if (bar_height > 0)
+		{
+			UTIL_LCD_DrawLine(x, (uint32_t)y_start, x, (int32_t)(w.y + w.height - 1), UTIL_LCD_COLOR_BLUE);
+		}
+	}
+
+}
+
+// todo: verify if it plots the buffers interchangibly
+void draw_buffer(audio_plotter_handle_t *h, int16_t *buff, uint32_t buffSize)
+{
+  h->drawing.window.y      = h->main_window.y;
+  h->drawing.window.width  = h->main_window.width/2;
+  h->drawing.window.height = h->main_window.height;
+
+  //sample(h, SAMPLE_DECIMATION);
+  if (toggle)
+  {
+	 h->drawing.window.x = h->main_window.x;
+	 toggle = 0;
+  }
+  else
+  {
+    h->drawing.window.x = h->main_window.x + h->main_window.width / 2;
+    toggle = 1;
+  }
+  //plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+  draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
+
+}
+
+
+void draw_segment(audio_plotter_handle_t *h, uint8_t draw_method)
+{
+    uint32_t segment_width = h->main_window.width / h->n_segments;
+
+    h->drawing.window.x = h->main_window.x + (h->current_segment_idx* segment_width);
+    h->drawing.window.y = h->main_window.y;
+    h->drawing.window.width = segment_width;
+    h->drawing.window.height = h->main_window.height;
+
+    draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
+
+    h->current_segment_idx++;
+    if (h->current_segment_idx>= h->n_segments) {
+    	h->current_segment_idx = 0;
+    }
+}
+
+
+
+
+
+
+

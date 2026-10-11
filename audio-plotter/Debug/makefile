@@ -12,6 +12,22 @@ RM := rm -rf
 -include Utilities/lcd/subdir.mk
 -include PDM2PCM/App/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
+-include Drivers/CMSIS_DSP/Source/WindowFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/TransformFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/SupportFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/StatisticsFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/SVMFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/QuaternionMathFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/MatrixFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/InterpolationFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/FilteringFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/FastMathFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/DistanceFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/ControllerFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/ComplexMathFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/CommonTables/subdir.mk
+-include Drivers/CMSIS_DSP/Source/BayesFunctions/subdir.mk
+-include Drivers/CMSIS_DSP/Source/BasicMathFunctions/subdir.mk
 -include Drivers/BSP/STM32H750B-DK/subdir.mk
 -include Drivers/BSP/Components/wm8994/subdir.mk
 -include Drivers/BSP/Components/mt48lc4m32b2/subdir.mk
@@ -67,8 +83,8 @@ all: main-build
 main-build: audio-plotter.elf secondary-outputs
 
 # Tool invocations
-audio-plotter.elf audio-plotter.map: $(OBJS) $(USER_OBJS) /home/irinej/faks/stm32h750-audio/audio-plotter/STM32H750XBHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "audio-plotter.elf" @"objects.list" $(USER_OBJS) -Wl,--start-group $(LIBS) -Wl,--end-group -mcpu=cortex-m7 -T"/home/irinej/faks/stm32h750-audio/audio-plotter/STM32H750XBHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="audio-plotter.map" -Wl,--gc-sections -static -L../Middlewares/ST/STM32_Audio/Addons/PDM/Lib --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+audio-plotter.elf audio-plotter.map: $(OBJS) $(USER_OBJS) /home/irinej/faks/audio-plotter-dsp/audio-plotter/STM32H750XBHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "audio-plotter.elf" @"objects.list" $(USER_OBJS) -Wl,--start-group $(LIBS) -Wl,--end-group -mcpu=cortex-m7 -T"/home/irinej/faks/audio-plotter-dsp/audio-plotter/STM32H750XBHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="audio-plotter.map" -Wl,--gc-sections -static -L../Middlewares/ST/STM32_Audio/Addons/PDM/Lib --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

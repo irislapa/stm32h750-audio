@@ -172,7 +172,14 @@ SECTIONS
     . = ALIGN(32);
   } >RAM_D3
   
-  
+  /* D2 region config for DSP */
+  .RAM_D2 (NOLOAD) :
+  {
+    . = ALIGN(4);
+    *(.RAM_D2)
+    *(.RAM_D2*)
+    . = ALIGN(4);
+  } >RAM_D2
   
 
   /* Remove information from the standard libraries */

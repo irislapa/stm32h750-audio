@@ -67,7 +67,50 @@ Core/Src/audio_plotter_draw.o: ../Core/Src/audio_plotter_draw.c \
  ../Drivers/BSP/STM32H750B-DK/stm32h750b_discovery_sdram.h \
  ../Drivers/BSP/STM32H750B-DK/../Components/mt48lc4m32b2/mt48lc4m32b2.h \
  ../Core/Inc/mt48lc4m32b2_conf.h ../Utilities/lcd/stm32_lcd.h \
- ../Utilities/Fonts/fonts.h ../Core/Inc/plot_err.h
+ ../Utilities/Fonts/fonts.h ../Core/Inc/plot_err.h \
+ ../Core/Inc/audio_plotter_config.h ../Core/Inc/audio_queue.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math_types.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math_memory.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/none.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/utils.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/basic_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/interpolation_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/bayes_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/statistics_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/fast_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/matrix_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/complex_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/fast_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/statistics_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/controller_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/support_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/distance_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/matrix_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/svm_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/svm_defines.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/fast_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/transform_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/complex_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/filtering_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/support_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/quaternion_math_functions.h \
+ ../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/window_functions.h
 ../Core/Inc/audio_plotter.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -140,3 +183,47 @@ Core/Src/audio_plotter_draw.o: ../Core/Src/audio_plotter_draw.c \
 ../Utilities/lcd/stm32_lcd.h:
 ../Utilities/Fonts/fonts.h:
 ../Core/Inc/plot_err.h:
+../Core/Inc/audio_plotter_config.h:
+../Core/Inc/audio_queue.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math_types.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/arm_math_memory.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/none.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/utils.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/basic_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/interpolation_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/bayes_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/statistics_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/fast_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_memory.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/arm_math_types.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/none.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/utils.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/matrix_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/complex_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/fast_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/statistics_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/controller_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/support_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/distance_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/basic_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/matrix_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/svm_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/svm_defines.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/fast_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/transform_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/complex_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/filtering_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/../../../CMSIS_DSP/Include/dsp/support_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/quaternion_math_functions.h:
+../Core/Inc/../../Drivers/CMSIS_DSP/Include/dsp/window_functions.h:

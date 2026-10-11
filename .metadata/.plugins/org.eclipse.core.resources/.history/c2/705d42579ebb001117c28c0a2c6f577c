@@ -1,0 +1,128 @@
+/*
+ * signal_plotter.c
+ *
+ *  Created on: 19 Feb 2026
+ *      Author: irine
+ */
+#include "audio_plotter.h"
+#include "measureCycles.h"
+#include "plot_err.h"
+
+
+uint8_t fft = 1;
+#define FFT_LENGTH FFT_SAMPLE_SIZE/2
+arm_rfft_fast_instance_f32 fft_instance;
+float32_t x = 0;
+float32_t fft_out[FFT_LENGTH/2];
+float32_t fft_mag_out[FFT_LENGTH/2];
+
+float32_t data = 0;
+
+#ifndef PLOT_BUFF_SIZE
+#define PLOT_BUFF_SIZE 228
+#endif
+
+int16_t plot_buff[DEFAULT_PLOT_BUFF_SIZE];
+extern uint32_t current_adcDmaBuffer_size;
+
+extern void setSampleSize(uint32_t sample_size);
+
+void segment_config(audio_plotter_handle_t *h, uint16_t n_segments)
+{
+	if (!h) {
+		error_handler(ERR_NULL_PTR);
+		return;
+	}
+	if (n_segments == 0 || n_segments > DEFAULT_MAX_SEGMENTS)
+	{
+		error_handler(ERR_INVALID_PARAM);
+		return;
+	}
+	h->n_segments           = n_segments;
+	h->current_segment_idx  = 0;
+	h->drawing.data_size    = DEFAULT_PLOT_BUFF_SIZE / n_segments;
+}
+
+
+// todo: define default setup
+void init_plotter(audio_plotter_handle_t *h)
+{
+	if (!h) {
+		error_handler(ERR_NULL_PTR);
+		return;
+	}
+	if (h->sampling.audio_source != AUDIO_SOURCE_ADC &&
+	        h->sampling.audio_source != AUDIO_SOURCE_MEMS)
+	{
+		error_handler(ERR_UNSUPPORTED);
+		return;
+	}
+    h->drawing.data		= plot_buff;
+    h->drawing.data_size = DEFAULT_PLOT_BUFF_SIZE;
+
+    h->queue.size  = MAX_AUDIO_QUEUE_SIZE;
+    h->queue.r     = 0;
+    h->queue.wr    = 0;
+    h->queue.count = 0;
+    h->sampling.dma_wr      = 0;
+    if (h->sampling.audio_source == AUDIO_SOURCE_ADC)
+    {
+    	h->sampling.dc_offset = INT16_MAX;
+    }
+    h->fft.data = fft_out;
+    h->fft.mag_data = fft_mag_out;
+    h->fft.data_size = FFT_LENGTH/2;
+	//arm_rfft_fast_init_1024_f32(&fft_instance);
+
+	segment_config(h, 1);
+}
+
+// bottom of the callstack
+uint32_t core_clock;
+uint32_t t_pop;
+uint32_t t_sample;
+uint32_t t_draw;
+uint32_t t_fft;
+void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method)
+{
+	DWT_Init();
+	core_clock = get_system_clock();
+	uint32_t t0 = DWT_GetCycles();
+  if (!queue_pop(h)) return;		arm_rfft_fast_f32(&fft_instance, h->current_segment.p_samples, h->fft.data, 0);
+
+    t_pop = DWT_GetCycles() - t0;
+
+  //sample_segment(h, draw_method);
+    t_sample = DWT_GetCycles() - t0 - t_pop;
+  if (fft)
+  {
+		arm_rfft_fast_f32(&fft_instance, (uint32_t**) h->current_segment.p_samples, h->fft.data, 0);
+	    t_fft = DWT_GetCycles() - t0 - t_pop - t_sample;
+
+		arm_cmplx_mag_f32(h->fft.data, h->fft.mag_data, h->fft.data_size);
+  }
+
+  draw_spectogram(h, h->main_window);
+  //draw_segment(h, draw_method);
+
+  t_draw = DWT_GetCycles() - t0 - t_pop - t_sample;
+  uint32_t t1 = DWT_GetCycles();
+  n_cycles = t1 - t0;
+ }
+
+
+/*=========== error handler for fatal errors in plotter code ============ */
+void error_handler(uint32_t error_code)
+{
+    __disable_irq();
+    __BKPT(0);   // debugger stops here if attached
+    uint32_t code = error_code;
+    while (1)
+    {
+        // stay here for debugger inspection
+    }
+}
+
+
+
+

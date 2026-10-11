@@ -1,0 +1,207 @@
+/*
+ * audio_plotter_sampling.c
+ *
+ *  Created on: 19 Mar 2026
+ *      Author: irinej
+ */
+
+#include "audio_plotter.h"
+
+
+int16_t uint16_to_int16(uint16_t uint)
+{
+	return uint - ((uint32_t) uint >> 15 << 16);
+}
+
+// simple downsample by picking every Nth sample, where N = in_size / out_size
+void simple_downsample(const uint16_t *p_buff_in, uint32_t in_size,
+  uint32_t dc_offset, int16_t *p_buff_out, uint32_t out_size)
+{
+  if (out_size == 0 || p_buff_in == NULL || p_buff_out == NULL)
+  {
+    error_handler(ERR_INVALID_PARAM);
+    return;
+  }
+
+  uint16_t group_size = (uint16_t) (in_size / out_size);
+  if (group_size == 0)
+  {
+    error_handler(ERR_OUT_OF_BOUNDS);
+    return;
+  }
+
+  for(uint32_t i = 0; i < out_size; i++)
+  {
+      uint32_t idx = (i * group_size);
+      if (idx < in_size)
+      {
+          uint16_t raw  = p_buff_in[idx];
+          p_buff_out[i] = (int16_t)((int32_t)raw - dc_offset);
+      }
+  }
+}
+
+// downsample by picking min and max from each group of samples, where group size = in_size / (out_size/2)
+void peak_downsample(const uint16_t *p_buff_in, uint32_t in_size,
+		uint32_t dc_offset, uint32_t group_size, int16_t *p_buff_out, uint32_t out_size)
+{
+  if (!p_buff_in || !p_buff_out || in_size == 0 || out_size < 2) return;
+  if (out_size & 1) return; // must be even
+
+
+  uint32_t n_groups = out_size / group_size;
+  uint32_t step = in_size / n_groups;
+  if (step == 0) step = 1;
+
+  for (uint32_t g = 0; g < n_groups; g++)
+  {
+    int16_t mn = INT16_MAX;
+    int16_t mx = INT16_MIN;
+
+    uint32_t base = g * step;
+
+    for (uint32_t j = 0; j < step; j++)
+    {
+      int16_t s = p_buff_in[base + j] - dc_offset;
+
+      // cap to range
+      if (s < mn) mn = s;
+      if (s > mx) mx = s;
+    }
+    p_buff_out[2*g]     = mn;
+    p_buff_out[2*g + 1] = mx;
+  }
+}
+
+// downsample by picking the average of each group of samples
+void avg_downsample(const uint16_t *p_buff_in, uint32_t in_size,
+		uint32_t dc_offset, int16_t *p_buff_out, uint32_t out_size)
+{
+  if (!p_buff_in || !p_buff_out || in_size == 0 || out_size == 0) return;
+
+  uint32_t step = (uint16_t) (in_size / out_size);
+  if (step == 0) return;
+
+  for (uint32_t i = 0; i < out_size; i++)
+  {
+    uint32_t base = i * step;
+
+    if (base + step > in_size) break;
+
+    int32_t sum = 0;
+    for (uint32_t j = 0; j < step; j++)
+    {
+      sum += p_buff_in[base + j];
+    }
+    p_buff_out[i] = (int16_t)(sum / (int32_t)step) - dc_offset;
+  }
+}
+
+void high_pass_filter(const int16_t *p_buff_in, int16_t *p_buff_out, uint32_t size, uint32_t window)
+{
+    // A simple Moving Average Subtraction filter
+    for (uint32_t i = 0; i < size; i++)
+    {
+        int32_t sum = 0;
+        uint32_t count = 0;
+
+        // 1. Calculate the Low-Pass (Average) for the current window
+        for (int32_t j = -(int32_t)window; j <= (int32_t)window; j++)
+        {
+            if ((int32_t)i + j >= 0 && (int32_t)i + j < size) {
+                sum += p_buff_in[i + j];
+                count++;
+            }
+        }
+        int16_t local_average = (int16_t)(sum / count);
+
+        // 2. Subtract the slow-moving average from the raw sample
+        p_buff_out[i] = p_buff_in[i] - local_average;
+    }
+}
+
+
+void upsample(const int16_t *p_buff_in, uint32_t in_size, int16_t *p_buff_out, uint32_t out_size)
+{
+  if (!p_buff_in || !p_buff_out || in_size == 0 || out_size == 0) return;
+
+  uint32_t step = out_size / in_size;
+  for (uint32_t i = 0; i < in_size; i++)
+  {
+	for (uint32_t s = 0; s < out_size; s += step)
+	{
+	  p_buff_out[s] = p_buff_in[i];
+	}
+  }
+}
+
+void sample_segment(audio_plotter_handle_t *h, uint8_t draw_mehod)
+{
+	uint16_t *p_buff_in = h->current_segment.p_samples;
+    uint32_t in_size    = h->current_segment.n_samples;
+    int16_t *p_buff_out = h->drawing.data;
+    uint32_t out_size   = h->drawing.data_size;
+    uint32_t dc_offset  = h->sampling.dc_offset;
+
+    if ((uint16_t *)p_buff_in == NULL || in_size == 0) return;
+
+    SCB_InvalidateDCache_by_Addr((uint16_t *)p_buff_in, in_size*sizeof(uint16_t));
+
+    switch (h->sampling.sampling_method)
+    {
+        case SAMPLE_DECIMATION:
+            simple_downsample(p_buff_in, in_size, dc_offset, p_buff_out, out_size);
+            break;
+
+        case PEAK_DECIMATION: // Combined into one logic using dc_offset
+            peak_downsample(p_buff_in, in_size, dc_offset, 2, p_buff_out, out_size);
+            break;
+
+        case AVG_DECIMATION:
+            avg_downsample(p_buff_in, in_size, dc_offset, p_buff_out, out_size);
+            break;
+
+        case PREPROCESS_FOR_FFT:
+
+
+        default:
+            error_handler(ERR_UNSUPPORTED);
+            break;
+    }
+}
+
+void calculate_mean(uint16_t *data, uint32_t data_size, uint32_t *result)
+{
+	int32_t res = 0;
+	for (int i = 0; i < data_size; i++)
+	{
+		res += (int_16) data[i];
+	}
+	*result = res/data_size;
+}
+
+void normalise_data_to_float(uint16_t *raw_data, float32_t *out_data, uint32_t data_size)
+{
+	uint32_t mean;
+	calculate_mean(raw_data, data_size, mean);
+	for (int i = 0; i < data_size; i++)
+	{
+		out_data[i] = (float32_t) (((int16_t) raw_data[i]) - (int16_t) mean);
+	}
+}
+
+
+void preprocess_fft(uint16_t *raw_data, float32_t *processed_data, uint32_t data_size)
+{
+	int32_t mean = 0;
+	for (int i = 0; i < data_size; i++)
+	{
+		mean += (int_16) data[i];
+	}
+	mean = mean/data_size;
+	for (int i = 0; i < data_size; i++)
+	{
+		out_data[i] = (float32_t) (((int16_t) raw_data[i]) - (int16_t) mean);
+	}
+}
+

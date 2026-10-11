@@ -1,0 +1,50 @@
+2026-09-29 10:46:32,313 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 10:46:32.312:INFO :oejs.Server:main: Stopped Server@6095533{STOPPING}[10.0.25,sto=0]
+2026-09-29 10:46:32,331 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 10:46:32.331:INFO :oejs.AbstractConnector:main: Stopped ServerConnector@4d9cc932{HTTP/1.1, (http/1.1)}{localhost:0}
+2026-09-29 10:46:32,335 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 10:46:32.334:INFO :oejsh.ContextHandler:main: Stopped o.e.j.s.ServletContextHandler@746ab137{/chat,file:///home/irinej/.eclipse/com.st.stm32cube.ide.mcu.rcp.product_2.0.0_1934254364_linux_gtk_x86_64/plugins/com.genuitec.copilot4eclipse.chat_1.7.1.202509041430/web/,STOPPED}
+2026-09-29 10:46:34,218 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-09-29 11:16:57,072 [INFO] Activator:176 - 
+
+
+2026-09-29 11:16:57,073 [INFO] Activator:177 - !SESSION log4j initialized
+2026-09-29 11:17:00,403 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-09-29 11:17:03,164 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.162:INFO :jei.FileDataWriter:Worker-5: C4E Startup: Interruptible file channel will be used
+2026-09-29 11:17:03,165 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] java.lang.reflect.InaccessibleObjectException: Unable to make public void sun.nio.ch.FileChannelImpl.setUninterruptible() accessible: module java.base does not "exports sun.nio.ch" to unnamed module @6b56d6d6
+2026-09-29 11:17:03,165 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.AccessibleObject.throwInaccessibleObjectException(AccessibleObject.java:391)
+2026-09-29 11:17:03,165 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:367)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:315)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:203)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.Method.setAccessible(Method.java:197)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.io.FileDataWriter$Companion$setUninterruptibleMethod$1.invoke(FileDataWriter.kt:188)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.io.FileDataWriter$Companion$setUninterruptibleMethod$1.invoke(FileDataWriter.kt:185)
+2026-09-29 11:17:03,166 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.util.UnsafeHolder.doPrivileged$lambda-0(UnsafeHolder.kt:30)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at java.base/java.security.AccessController.doPrivileged(AccessController.java:571)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.util.UnsafeHolder.doPrivileged(UnsafeHolder.kt:29)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.io.FileDataWriter.<clinit>(FileDataWriter.kt:185)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.io.FileDataReaderWriterProvider.newFileDataWriter(FileDataReaderWriterProvider.kt:48)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.io.FileDataReaderWriterProvider.newReaderWriter(FileDataReaderWriterProvider.kt:30)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.log.LogConfig.createReaderWriter(LogConfig.java:359)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.log.LogConfig.getReader(LogConfig.java:125)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.log.Log.<init>(Log.kt:52)
+2026-09-29 11:17:03,167 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments.newLogInstance(Environments.kt:117)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments.newLogInstance(Environments.kt:81)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments.newLogInstance(Environments.kt:77)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments$newInstance$4.invoke(Environments.kt:46)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments$newInstance$4.invoke(Environments.kt:46)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments.prepare(Environments.kt:120)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.env.Environments.newInstance(Environments.kt:46)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.entitystore.PersistentEntityStores.newInstance(PersistentEntityStores.java:64)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at jetbrains.exodus.entitystore.PersistentEntityStores.newInstance(PersistentEntityStores.java:70)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at com.genuitec.copilot4eclipse.chat.persistence.ChatPersistenceManager.init(ChatPersistenceManager.java:52)
+2026-09-29 11:17:03,168 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at com.genuitec.copilot4eclipse.chat.persistence.ChatPersistenceManager.<init>(ChatPersistenceManager.java:42)
+2026-09-29 11:17:03,169 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at com.genuitec.copilot4eclipse.chat.ChatService.init(ChatService.java:173)
+2026-09-29 11:17:03,169 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at com.genuitec.copilot4eclipse.boot.Bootup.basicStart(Bootup.java:67)
+2026-09-29 11:17:03,169 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at com.genuitec.copilot4eclipse.boot.Bootup$1.run(Bootup.java:34)
+2026-09-29 11:17:03,169 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+2026-09-29 11:17:03,254 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.253:INFO :jee.EnvironmentImpl:Worker-5: C4E Startup: Exodus environment created: /home/irinej/faks/audio-plotter-dsp/.metadata/.plugins/com.genuitec.copilot4eclipse/chatdata
+2026-09-29 11:17:03,324 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.324:WARN :oejsh.ContextHandler:Worker-1: Chat Internal Service: o.e.j.s.ServletContextHandler@1a3ae7c4{/,null,STOPPED} contextPath ends with /
+2026-09-29 11:17:03,370 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.370:INFO :oejs.Server:Worker-1: Chat Internal Service: jetty-10.0.25; built: 2025-03-13T00:02:39.342Z; git: 96cc25d2f26c3fb61444b801be87640e59cf380e; jvm 21.0.8+9-LTS
+2026-09-29 11:17:03,409 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.409:INFO :oejss.DefaultSessionIdManager:Worker-1: Chat Internal Service: Session workerName=node0
+2026-09-29 11:17:03,413 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.412:INFO :oejsh.ContextHandler:Worker-1: Chat Internal Service: Started o.e.j.s.ServletContextHandler@1a3ae7c4{/chat,file:///home/irinej/.eclipse/com.st.stm32cube.ide.mcu.rcp.product_2.0.0_1934254364_linux_gtk_x86_64/plugins/com.genuitec.copilot4eclipse.chat_1.7.1.202509041430/web/,AVAILABLE}
+2026-09-29 11:17:03,420 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.420:INFO :oejs.AbstractConnector:Worker-1: Chat Internal Service: Started ServerConnector@1c335fa3{HTTP/1.1, (http/1.1)}{localhost:42337}
+2026-09-29 11:17:03,422 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 2026-09-29 11:17:03.422:INFO :oejs.Server:Worker-1: Chat Internal Service: Started Server@7c3d37bc{STARTING}[10.0.25,sto=0] @12061ms
+2026-09-29 23:02:31,442 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SWT SessionManagerDBus: Failed to UnregisterClient: GDBus.Error:org.freedesktop.DBus.Error.NoReply: Message recipient disconnected from message bus without replying

@@ -17,6 +17,7 @@
 #define AUDIO_VOLUME               40U
 #define AUDIO_IN_PDM_BUFFER_SIZE   ((uint32_t)(128U * AUDIO_SAMPLE_RATE_HZ / 16000U * 2U))
 #define AUDIO_PCM_BUFFER_SIZE 4096U
+#define INVERT_CH(ch) (3U - (ch)) // universal solution for mono/stereo, returns 2 for mono and 1 for stereo
 
 /* DMA buffer ---------------------------------------------------------------*/
 #if defined ( __CC_ARM )
@@ -77,21 +78,22 @@ void PlotMemsDemo(void)
   BSP_AUDIO_IN_RecordPDM(1, (uint8_t*)&recordPDMBuff, 2U * AUDIO_IN_PDM_BUFFER_SIZE);
 
 
-  hplot_mems.decimate.audio_source = AUDIO_SOURCE_MEMS;
-  hplot_mems.decimate.buffer = (int16_t *) recordPCMBuff;
-  hplot_mems.decimate.buffer_size = AUDIO_PCM_BUFFER_SIZE;
-  hplot_mems.decimate.dma_wr = pcmWritePtr;
-  hplot_mems.main_window.x = 12;
-  hplot_mems.main_window.y = 102;
-  hplot_mems.main_window.width = x_size - 24;
-  hplot_mems.main_window.height = y_size - 114;
+  hplot_mems.sampling.audio_source    = AUDIO_SOURCE_MEMS;
+  hplot_mems.sampling.sampling_method = PEAK_DECIMATION;
+  hplot_mems.sampling.data			  = (int16_t *) recordPCMBuff;
+  hplot_mems.sampling.data_size       = AUDIO_PCM_BUFFER_SIZE;
+  hplot_mems.sampling.dma_wr          = pcmWritePtr;
+  hplot_mems.main_window.x            = 12;
+  hplot_mems.main_window.y            = 102;
+  hplot_mems.main_window.width        = x_size - 24;
+  hplot_mems.main_window.height       = y_size - 114;
 
   init_plotter(&hplot_mems);
 
 
   while (1)
   {
-	plot_audio(&hplot_mems);
+	draw_audio_signal(&hplot_mems, MINMAX);
     if (CheckForUserInput() > 0)
     {
       ButtonState = 0;
@@ -102,45 +104,48 @@ void PlotMemsDemo(void)
   }
 }
 
+
+void Process_Input(uint32_t Instance, uint32_t pdm_offset)
+{
+	BSP_AUDIO_IN_PDMToPCM(Instance,
+						(uint16_t*)&recordPDMBuff[pdm_offset],
+						&recordPCMBuff[pcmWritePtr]);
+
+	SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[pcmWritePtr],
+						  AUDIO_IN_PDM_BUFFER_SIZE/4);
+
+
+	// todo: extract segment size from plot_t
+	if (pcmWritePtr % hplot_mems.sampling.data_size == 0 && pcmWritePtr != 0)
+	{
+		uint32_t n_samples = hplot_mems.sampling.data_size/hplot_mems.n_segments;
+		audio_segment_t seg = {
+		.p_samples = (int16_t *)&recordPCMBuff[pcmWritePtr],
+		.n_samples = hplot_mems.sampling.data_size
+		};
+
+	__disable_irq();
+	queue_push(&hplot_mems, seg);
+	__enable_irq();
+	}
+	pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2/INVERT_CH(channel_nbr);
+	if(pcmWritePtr >= AUDIO_PCM_BUFFER_SIZE)
+	{
+	  pcmWritePtr = 0;
+	}
+}
+
 /**
   * @brief  DMA transfer complete callback for MEMS PDM.
   * @retval None
   */
 void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
 {
-  if (Instance != 1U)
-  {
-    return;
-  }
+  if (Instance != 1) return;
 
-  SCB_InvalidateDCache_by_Addr((uint32_t *)&recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE / 2U],
-                               AUDIO_IN_PDM_BUFFER_SIZE * 2U);
-
-  BSP_AUDIO_IN_PDMToPCM(Instance,
-                        (uint16_t*)&recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE / 2U],
-                        &recordPCMBuff[pcmWritePtr]);
-
-  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[pcmWritePtr],
-                          AUDIO_IN_PDM_BUFFER_SIZE / 4U);
-
-  pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
-  if(pcmWritePtr >= AUDIO_PCM_BUFFER_SIZE)
-  {
-	  pcmWritePtr = 0;
-  }
-
-  __disable_irq();
-  hplot_mems.decimate.dma_transfer = DMA_TRANSFER_COMPLETE;
-  hplot_mems.decimate.dma_wr = pcmWritePtr;
-  hplot_mems.decimate.plot_flag = 1;
-
-  audio_segment_t seg = {
-    .p_samples = (int16_t *)&recordPCMBuff[pcmWritePtr],
-    .n_samples = AUDIO_IN_PDM_BUFFER_SIZE / 4 / 2
-  };
-  plotter_queue_push(&hplot_mems, seg);
-  __enable_irq();
-
+  SCB_InvalidateDCache_by_Addr((uint32_t *)&recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE/2],
+                               AUDIO_IN_PDM_BUFFER_SIZE*2);
+  Process_Input(Instance, AUDIO_IN_PDM_BUFFER_SIZE/2);
 }
 
 /**
@@ -149,37 +154,9 @@ void BSP_AUDIO_IN_TransferComplete_CallBack(uint32_t Instance)
   */
 void BSP_AUDIO_IN_HalfTransfer_CallBack(uint32_t Instance)
 {
-  if (Instance != 1U)
-  {
-    return;
-  }
+  if (Instance != 1) return;
 
   SCB_InvalidateDCache_by_Addr((uint32_t *)&recordPDMBuff[0],
-                               AUDIO_IN_PDM_BUFFER_SIZE * 2U);
-
-  BSP_AUDIO_IN_PDMToPCM(Instance,
-                        (uint16_t*)&recordPDMBuff[0],
-                        &recordPCMBuff[pcmWritePtr]);
-
-  SCB_CleanDCache_by_Addr((uint32_t*)&recordPCMBuff[pcmWritePtr],
-                          AUDIO_IN_PDM_BUFFER_SIZE / 4U);
-
-  pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2;
-  if(pcmWritePtr >= AUDIO_PCM_BUFFER_SIZE)
-  {
-	  pcmWritePtr = 0;
-  }
-
-  __disable_irq();
-  hplot_mems.decimate.dma_transfer = DMA_TRANSFER_HALF;
-  hplot_mems.decimate.dma_wr = pcmWritePtr;
-  hplot_mems.decimate.plot_flag = 1;
-
-  audio_segment_t seg = {
-    .p_samples = (uint16_t *)&recordPCMBuff[pcmWritePtr],
-    .n_samples = AUDIO_IN_PDM_BUFFER_SIZE / 4 / 2
-  };
-  plotter_queue_push(&hplot_mems, seg);
-  __enable_irq();
-
+                               AUDIO_IN_PDM_BUFFER_SIZE*2);
+  Process_Input(Instance, 0);
 }

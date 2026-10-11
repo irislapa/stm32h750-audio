@@ -1,3 +1,5 @@
-../Core/Src/audio_plotter_draw.c:13:6:plot_segment_wave	8
-../Core/Src/audio_plotter_draw.c:45:6:plot_segment_minmax	6
-../Core/Src/audio_plotter_draw.c:84:6:plot_buffer	3
+../Core/Src/audio_plotter_draw.c:14:6:draw_segment_wave	9
+../Core/Src/audio_plotter_draw.c:46:6:draw_segment_minmax	10
+../Core/Src/audio_plotter_draw.c:77:6:draw_spectogram	5
+../Core/Src/audio_plotter_draw.c:104:6:draw_buffer	2
+../Core/Src/audio_plotter_draw.c:127:6:draw_segment	2

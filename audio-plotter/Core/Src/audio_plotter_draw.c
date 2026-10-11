@@ -7,10 +7,11 @@
 
 #include "audio_plotter.h"
 
+uint8_t toggle = 0;
 
 
 
-void plot_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w)
+void draw_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w)
 {
     if (!seg || seg_size == 0 || w.width == 0 || w.height == 0) return;
 
@@ -42,18 +43,18 @@ void plot_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w)
 }
 
 
-void plot_segment_minmax(const int16_t *seg, uint32_t seg_size, draw_window_t w)
+void draw_segment_minmax(const int16_t *seg, uint32_t seg_size, draw_window_t w)
 {
     if (!seg || (seg_size < 2) || (seg_size & 1u)) return;
 
     UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
 
     const int32_t mid = (int32_t)w.y + (int32_t)w.height / 2;
-    uint32_t n_groups = seg_size / 2u;
+    uint32_t n_pairs = seg_size / 2u;
 
     for (uint32_t px = 0; px < w.width; px+=2)
     {
-        uint32_t g = (uint32_t)(((uint64_t)px * (n_groups - 1u)) / (w.width - 1u));
+        uint32_t g = (uint32_t)(((uint64_t)px * (n_pairs - 1u)) / (w.width - 1u));
 
         int32_t mn = seg[2*g];
         int32_t mx = seg[2*g + 1u];
@@ -73,37 +74,72 @@ void plot_segment_minmax(const int16_t *seg, uint32_t seg_size, draw_window_t w)
     }
 }
 
-
-/**
- * @brief should use plot_segment to plot first half and second half of the buffer interchangibly
- *
- * @param sampleBuffer
- * @param window
- */
-// todo: verify if it plots the buffers interchangibly
-void plot_buffer(audio_plotter_handle_t *h,int16_t *buff, uint32_t buffSize)
+void draw_spectogram(audio_plotter_handle_t *h, float32_t *data, draw_window_t w)
 {
-  h->plot.window.y = h->main_window.y;
-  h->plot.window.width = h->main_window.width/2;
-  h->plot.window.height = h->main_window.height;
+    UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
 
-  decimate(h, SAMPLE_DECIMATION);
+    for (uint32_t px = 0; px < w.width/2; px++)
+	{
+		uint32_t idx = (uint32_t)((px * (512/2 - 1u)) / (w.width/2 - 1u));
+		int32_t val = data[idx];
 
-  if (h->decimate.dma_transfer == DMA_TRANSFER_HALF)
+		//int32_t bar_height = (val * (int32_t)w.height) / INT16_MAX;
+		int32_t bar_height = val / w.height * 0.5 * 0.5 * 0.5;
+
+		if (bar_height < 0) bar_height = 0;
+		if (bar_height > (int32_t)w.height) bar_height = (int32_t)w.height;
+
+		int32_t y_start = (int32_t)w.y + (int32_t)w.height - bar_height;
+		uint32_t x = w.x + px;
+
+		if (bar_height > 0)
+		{
+			UTIL_LCD_DrawLine(x, (uint32_t)y_start, x, (int32_t)(w.y + w.height - 1), UTIL_LCD_COLOR_BLUE);
+		}
+	}
+
+}
+
+// todo: verify if it plots the buffers interchangibly
+void draw_buffer(audio_plotter_handle_t *h, int16_t *buff, uint32_t buffSize)
+{
+  h->drawing.window.y      = h->main_window.y;
+  h->drawing.window.width  = h->main_window.width/2;
+  h->drawing.window.height = h->main_window.height;
+
+  //sample(h, SAMPLE_DECIMATION);
+  if (toggle)
   {
-    h->plot.window.x = h->main_window.x;
+	 h->drawing.window.x = h->main_window.x;
+	 toggle = 0;
   }
-  else if (h->decimate.dma_transfer == DMA_TRANSFER_COMPLETE)
+  else
   {
-    h->plot.window.x = h->main_window.x + h->main_window.width/2;
+    h->drawing.window.x = h->main_window.x + h->main_window.width / 2;
+    toggle = 1;
   }
-  plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
-  //plot_segment_minmax(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+  //plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
+  draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
 
 }
 
 
+void draw_segment(audio_plotter_handle_t *h, uint8_t draw_method)
+{
+    uint32_t segment_width = h->main_window.width / h->n_segments;
 
+    h->drawing.window.x = h->main_window.x + segment_width/2 + (h->current_segment_idx* segment_width);
+    h->drawing.window.y = h->main_window.y;
+    h->drawing.window.width = segment_width/2;
+    h->drawing.window.height = h->main_window.height;
+
+    draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
+
+    h->current_segment_idx++;
+    if (h->current_segment_idx>= h->n_segments) {
+    	h->current_segment_idx = 0;
+    }
+}
 
 
 
