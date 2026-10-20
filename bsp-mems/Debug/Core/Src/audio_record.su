@@ -1,6 +1,0 @@
-../Core/Src/audio_record.c:145:6:AudioRecord_demo	32	static
-../Core/Src/audio_record.c:254:10:get_g_rec_wr	0	static
-../Core/Src/audio_record.c:264:6:BSP_AUDIO_IN_TransferComplete_CallBack	16	static,ignoring_inline_asm
-../Core/Src/audio_record.c:305:6:BSP_AUDIO_IN_HalfTransfer_CallBack	16	static,ignoring_inline_asm
-../Core/Src/audio_record.c:347:6:HAL_ADC_ConvCpltCallback	0	static
-../Core/Src/audio_record.c:361:6:HAL_ADC_ConvHalfCpltCallback	0	static

@@ -18,7 +18,7 @@ A real-time audio waveform plotter for the **STM32H750B-DK** discovery board. It
 - Toolchain: STM32CubeIDE, STM32 HAL + board BSP
 
 ## Pipeline
-![[attachments/diagram.png]]
+![pipeline|541](attachments/diagram.png)
 ```
  capture (DMA)  ──►  segment queue  ──►  decimate  ──►  draw  ──►  display
 ```
