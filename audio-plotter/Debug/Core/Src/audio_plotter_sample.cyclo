@@ -1,11 +1,7 @@
 ../Core/Src/audio_plotter_sample.c:11:9:uint16_to_int16	1
 ../Core/Src/audio_plotter_sample.c:17:6:simple_downsample	7
-../Core/Src/audio_plotter_sample.c:45:6:peak_downsample	11
+../Core/Src/audio_plotter_sample.c:45:6:peak_downsample	13
 ../Core/Src/audio_plotter_sample.c:77:6:avg_downsample	9
 ../Core/Src/audio_plotter_sample.c:100:6:high_pass_filter	5
 ../Core/Src/audio_plotter_sample.c:124:6:upsample	7
-../Core/Src/audio_plotter_sample.c:138:6:sample_segment	9
-../Core/Src/audio_plotter_sample.c:173:6:calculate_mean	2
-../Core/Src/audio_plotter_sample.c:183:6:normalise_data_to_float	2
-../Core/Src/audio_plotter_sample.c:194:6:preprocess_fft	3
-../Core/Src/audio_plotter_sample.c:208:6:postprocess_fft	2
+../Core/Src/audio_plotter_sample.c:138:6:sample_segment	7

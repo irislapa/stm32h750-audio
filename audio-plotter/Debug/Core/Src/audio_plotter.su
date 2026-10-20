@@ -1,6 +1,8 @@
-../Core/Src/audio_plotter.c:30:6:segment_config	16	static
-../Core/Src/audio_plotter.c:48:6:init_plotter	16	static
-../Core/Src/audio_plotter.c:81:6:copy_fft	32	static
-../Core/Src/audio_plotter.c:91:6:apply_wf	24	static
-../Core/Src/audio_plotter.c:105:6:draw_audio_signal	32	static
-../Core/Src/audio_plotter.c:144:6:error_handler	24	static,ignoring_inline_asm
+../Core/Src/audio_plotter.c:32:6:segment_config	16	static
+../Core/Src/audio_plotter.c:50:6:init_plotter	16	static
+../Core/Src/audio_plotter.c:83:6:copy_fft	32	static
+../Core/Src/audio_plotter.c:92:6:copy_fft_mono	32	static
+../Core/Src/audio_plotter.c:102:6:apply_hanning	24	static
+../Core/Src/audio_plotter.c:151:6:draw_waveform	24	static
+../Core/Src/audio_plotter.c:159:6:draw_freq_spectogram	32	static
+../Core/Src/audio_plotter.c:173:6:error_handler	24	static,ignoring_inline_asm

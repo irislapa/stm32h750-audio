@@ -13,14 +13,12 @@ void queue_push(audio_plotter_handle_t *h, audio_segment_t seg)
 	if (!h) return;
     queue_t *q = &h->queue;
 
-    __disable_irq();
 	if (q->count < q->size)
 	{
 		q->buffer[q->wr] = seg;
 	    q->wr = (q->wr + 1) % q->size;
 	    q->count++;
 	}
-	__enable_irq();
 }
 
 uint32_t queue_pop(audio_plotter_handle_t *h)

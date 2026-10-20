@@ -9,7 +9,10 @@
 
 uint8_t toggle = 0;
 
+#define SCALE_MEMS 128
+#define SCALE_ADC 16
 
+uint32_t scale;
 
 void draw_segment_wave(const int16_t *seg, uint32_t seg_size, draw_window_t w)
 {
@@ -74,17 +77,20 @@ void draw_segment_minmax(const int16_t *seg, uint32_t seg_size, draw_window_t w)
     }
 }
 
-void draw_spectogram(audio_plotter_handle_t *h, float32_t *data, draw_window_t w)
+void draw_segment_spectogram(audio_plotter_handle_t *h, float32_t *data, draw_window_t w)
 {
     UTIL_LCD_FillRect(w.x, w.y, w.width, w.height, UTIL_LCD_COLOR_WHITE);
 
-    for (uint32_t px = 0; px < w.width/2; px++)
+    for (uint32_t px = 0; px < w.width; px++)
 	{
-		uint32_t idx = (uint32_t)((px * (512/2 - 1u)) / (w.width/2 - 1u));
+		uint32_t idx = (px * (FFT_LENGTH/2 - 1)) / (w.width - 1);
 		int32_t val = data[idx];
 
 		//int32_t bar_height = (val * (int32_t)w.height) / INT16_MAX;
-		int32_t bar_height = val / w.height * 0.5 * 0.5 * 0.5;
+		if (h->sampling.audio_source == AUDIO_SOURCE_ADC) scale = SCALE_ADC;
+		else if (h->sampling.audio_source == AUDIO_SOURCE_MEMS) scale = SCALE_MEMS;
+		else scale = 1;
+		int32_t bar_height = val / w.height/ scale;
 
 		if (bar_height < 0) bar_height = 0;
 		if (bar_height > (int32_t)w.height) bar_height = (int32_t)w.height;
@@ -100,7 +106,7 @@ void draw_spectogram(audio_plotter_handle_t *h, float32_t *data, draw_window_t w
 
 }
 
-// todo: verify if it plots the buffers interchangibly
+// plots the whole dma buffer by plotting half of the buffer over half of the main_window area
 void draw_buffer(audio_plotter_handle_t *h, int16_t *buff, uint32_t buffSize)
 {
   h->drawing.window.y      = h->main_window.y;
@@ -120,20 +126,20 @@ void draw_buffer(audio_plotter_handle_t *h, int16_t *buff, uint32_t buffSize)
   }
   //plot_segment_wave(h->plot.buffer, h->plot.buffer_size, h->plot.window);
   draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
-
 }
 
 
-void draw_segment(audio_plotter_handle_t *h, uint8_t draw_method)
+// Plots the waveform data over 1 segment in given window. Number of segments can be configured with segment_config() in audio_plotter.c
+void draw_segment_waveform(audio_plotter_handle_t *h, uint8_t draw_method, draw_window_t window)
 {
-    uint32_t segment_width = h->main_window.width / h->n_segments;
+    uint32_t segment_width = window.width / h->n_segments;
 
-    h->drawing.window.x = h->main_window.x + segment_width/2 + (h->current_segment_idx* segment_width);
-    h->drawing.window.y = h->main_window.y;
-    h->drawing.window.width = segment_width/2;
-    h->drawing.window.height = h->main_window.height;
+    window.x = window.x + (h->current_segment_idx* segment_width);
+    window.y = window.y;
+    window.width = segment_width;
+    window.height = window.height;
 
-    draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
+    draw_segment_minmax(h->drawing.data, h->drawing.data_size, window);
 
     h->current_segment_idx++;
     if (h->current_segment_idx>= h->n_segments) {

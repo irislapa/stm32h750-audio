@@ -55,13 +55,10 @@ void PlotAdcDemo(void)
   UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_WHITE);
   UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_BLUE);
   UTIL_LCD_SetFont(&Font24);
-  UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *)"ADC RECORD PLOTTER", CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *)"EXTERNAL ANALOG MICROPHONE", CENTER_MODE);
   UTIL_LCD_SetFont(&Font16);
-  UTIL_LCD_DisplayStringAt(0, 24, (uint8_t *)"Press User button to stop", CENTER_MODE);
+  //UTIL_LCD_DisplayStringAt(0, 40, (uint8_t *)"Press User button to toggle audio input", CENTER_MODE);  // not enough flash for both demos
 
-  /* Plot frame */
-  UTIL_LCD_DrawRect(10, 100, x_size - 20, y_size - 110, UTIL_LCD_COLOR_BLUE);
-  UTIL_LCD_DrawRect(11, 101, x_size - 22, y_size - 112, UTIL_LCD_COLOR_BLUE);
 
   MX_DMA_Init();
   MX_TIM6_Init();
@@ -77,6 +74,27 @@ void PlotAdcDemo(void)
   hplot_adc.main_window.width        = x_size - 24;
   hplot_adc.main_window.height       = y_size - 114;
 
+
+  draw_window_t spectogram_window;
+  spectogram_window.x = 12;
+  spectogram_window.y = 101;
+  spectogram_window.width = 220;
+  spectogram_window.height = 150;
+  UTIL_LCD_DrawRect(10, 100, 224, 152, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(12, 70, (uint8_t *)"Frequency histogram:", LEFT_MODE);
+
+  draw_window_t waveform_window;
+  waveform_window.x = 224 + 10 + 12;
+  waveform_window.y = 101;
+  waveform_window.width = 220;
+  waveform_window.height = 150;
+  UTIL_LCD_DrawRect(10 + 224 + 10, 100, 224, 152, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(10 + 224 + 30, 70, (uint8_t *)"   Waveform:", LEFT_MODE);
+
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+  UTIL_LCD_DisplayStringAt(8, 258, (uint8_t *)"0Hz              8kHz", LEFT_MODE);
+
   //set_segments(&hplot_adc, 2);
   //set_sample_size(&hplot_adc, FFT_SAMPLE_SIZE);
   HAL_ADC_Start_DMA(&hadc3, (uint32_t*)adcDmaBuffer, FFT_SAMPLE_SIZE);
@@ -84,7 +102,9 @@ void PlotAdcDemo(void)
 
   while (1)
   {
-	  draw_audio_signal(&hplot_adc, MINMAX);
+		if (!queue_pop(&hplot_adc)) continue;
+		draw_waveform(&hplot_adc, waveform_window);
+		draw_freq_spectogram(&hplot_adc, spectogram_window);
 
     if (CheckForUserInput() > 0)
     {

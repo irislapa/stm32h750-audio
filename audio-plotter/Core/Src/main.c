@@ -53,22 +53,8 @@ static void MPU_Config(void);
 static void CPU_CACHE_Enable(void);
 void MPU_Config_D2_RAM(void);
 
-BSP_DemoTypedef  BSP_examples[]=
-{
-  {Touchscreen_demo1, "TOUCHSCREEN DEMO1", 0},
-  {Touchscreen_demo2, "TOUCHSCREEN DEMO2", 0},
-  {LCD_demo, "LCD", 0},
-  {AudioPlay_demo, "AUDIO PLAY", 0},
-  {AudioRecord_demo, "AUDIO RECORD", 0},
-  {MMC_demo, "MMC", 0},
-  {SDRAM_demo, "SDRAM", 0},
-  {SDRAM_DMA_demo, "SDRAM MDMA", 0}
-};
 
-
-
-
-
+uint32_t toggle_audio_input = 0;
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -150,16 +136,8 @@ int main(void)
   //AudioRecord_demo();
   PlotAdcDemo();
   //PlotMemsDemo();
-
-  while (1)
-  {
-	  if (CheckForUserInput() > 0)
-	  {
-		ButtonState = 0;
-		break;
-	  }
-  }
   //AudioPlay_demo();
+
   /* Wait For User inputs */
   while (1)
   {
@@ -172,10 +150,10 @@ int main(void)
 
       HAL_Delay(100);
 
-      if(DemoIndex >= COUNT_OF_EXAMPLE(BSP_examples))
-      {
-        DemoIndex = 0;
-      }
+      //if(DemoIndex >= COUNT_OF_EXAMPLE(BSP_examples))
+      //{
+      //  DemoIndex = 0;
+      //}
       Display_DemoDescription();
     }
   }

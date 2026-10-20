@@ -102,10 +102,11 @@ void segment_config(audio_plotter_handle_t *h, uint16_t n_segments);
 
 
 void sample_segment(audio_plotter_handle_t *h, uint8_t draw_mehod);
-void draw_segment(audio_plotter_handle_t *h, uint8_t draw_method);
+void draw_waveform(audio_plotter_handle_t *h, draw_window_t window);
+void draw_freq_spectogram(audio_plotter_handle_t *h, draw_window_t window);
 
 void init_plotter(audio_plotter_handle_t *h);
-void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method);
+//void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method);
 
 extern void queue_push(audio_plotter_handle_t *h, audio_segment_t seg);
 extern uint32_t queue_pop(audio_plotter_handle_t *h);

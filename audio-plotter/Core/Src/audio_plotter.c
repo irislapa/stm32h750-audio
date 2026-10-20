@@ -9,18 +9,20 @@
 #include "plot_err.h"
 
 
-uint8_t fft = 1;
-float32_t hamming[512];
-float32_t hanning[512];
-
-__attribute__((section(".RAM_D3")))arm_rfft_fast_instance_f32 fft_instance;
-__attribute__((section(".RAM_D3"))) float32_t fft_in[FFT_LENGTH];
-__attribute__((section(".RAM_D3"))) float32_t fft_out[FFT_LENGTH];
-__attribute__((section(".RAM_D3"))) float32_t fft_mag_out[FFT_LENGTH/2];
 
 #ifndef PLOT_BUFF_SIZE
 #define PLOT_BUFF_SIZE 228
 #endif
+
+uint8_t fft = 1;
+float32_t hamming[512];
+float32_t hanning[512];
+
+__attribute__((section(".RAM_D3"))) arm_rfft_fast_instance_f32 fft_instance;
+__attribute__((section(".RAM_D3"))) float32_t fft_in[FFT_LENGTH];
+__attribute__((section(".RAM_D3"))) float32_t fft_out[FFT_LENGTH];
+__attribute__((section(".RAM_D3"))) float32_t fft_mag_out[FFT_LENGTH/2];
+
 
 int16_t plot_buff[DEFAULT_PLOT_BUFF_SIZE];
 extern uint32_t current_adcDmaBuffer_size;
@@ -44,7 +46,6 @@ void segment_config(audio_plotter_handle_t *h, uint16_t n_segments)
 }
 
 
-// todo: define default setup
 void init_plotter(audio_plotter_handle_t *h)
 {
 	if (!h) {
@@ -78,17 +79,26 @@ void init_plotter(audio_plotter_handle_t *h)
 	segment_config(h, 1);
 }
 
-void copy_fft(uint16_t *dma_buff, uint16_t size, uint32_t curr_pointer)
+void copy_fft(uint16_t *data, uint16_t size, uint32_t curr_pointer)
 {
 	float32_t x = fft_in[0];
 	for (int i = 0; i < size; i++)
 	{
-		fft_in[i] = (float32_t) dma_buff[curr_pointer + i];
+		fft_in[i] = (float32_t) data[curr_pointer + i];
+	}
+}
+
+void copy_fft_mono(uint16_t *data, uint16_t size, uint32_t curr_pointer)
+{
+	float32_t x = fft_in[0];
+	for (int i = 0; i < size; i++)
+	{
+		fft_in[i] = (float32_t) data[curr_pointer + i*2];
 	}
 }
 
 
-void apply_wf(float32_t *buff, uint32_t buff_size)
+void apply_hanning(float32_t *buff, uint32_t buff_size)
 {
 	for (int i = 0; i < buff_size; i++)
 	{
@@ -96,13 +106,15 @@ void apply_wf(float32_t *buff, uint32_t buff_size)
 	}
 }
 
+
+/*
 // bottom of the callstack
 uint32_t core_clock;
 uint32_t t_pop;
 uint32_t t_sample;
 uint32_t t_draw;
 uint32_t t_fft;
-void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method)
+void draw_waveform(audio_plotter_handle_t *h, uint8_t draw_method)
 {
 	DWT_Init();
 	core_clock = get_system_clock();
@@ -117,13 +129,8 @@ void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method)
 	    float32_t mean;
 	    arm_mean_f32(fft_in, 512, &mean);
 	    arm_offset_f32(fft_in, -mean, fft_in, 512);
-	    apply_wf(fft_in, 512);
-	    //preprocess_fft(h->current_segment.p_samples, fft_in, FFT_LENGTH);
-		//arm_rfft_fast_f32(&fft_instance, (float32_t *) h->current_segment.p_samples, fft_out, 0);
-		arm_rfft_fast_f32(&fft_instance, fft_in, fft_out, 0);
-
-		//postprocess_fft(fft_out, fft_out, FFT_LENGTH/2);
-
+	    apply_hanning(fft_in, 512);
+	    arm_rfft_fast_f32(&fft_instance, fft_in, fft_out, 0);
 		arm_cmplx_mag_f32(&fft_out[2], &fft_mag_out[1], FFT_LENGTH/2-1);
 
   }
@@ -131,13 +138,34 @@ void draw_audio_signal(audio_plotter_handle_t *h, uint8_t draw_method)
   t_fft = DWT_GetCycles() - t0 - t_pop - t_sample;
 
 
-  draw_spectogram(h, fft_mag_out, h->main_window);
+  draw_segment_spectogram(h, fft_mag_out, h->main_window);
   draw_segment(h, draw_method);
 
   t_draw = DWT_GetCycles() - t0 - t_pop - t_sample;
   uint32_t t1 = DWT_GetCycles();
   n_cycles = t1 - t0;
- }
+}
+*/
+
+void draw_waveform(audio_plotter_handle_t *h, draw_window_t window)
+{
+	h->sampling.data = h->current_segment.p_samples;
+	h->sampling.data_size = h->current_segment.n_samples;
+	sample_segment(h, MINMAX);
+	draw_segment_waveform(h, MINMAX, window);
+}
+
+void draw_freq_spectogram(audio_plotter_handle_t *h, draw_window_t window)
+{
+	float32_t mean;
+	arm_mean_f32(fft_in, 512, &mean);
+	arm_offset_f32(fft_in, -mean, fft_in, 512);
+	apply_hanning(fft_in, 512);
+	arm_rfft_fast_f32(&fft_instance, fft_in, fft_out, 0);
+	arm_cmplx_mag_f32(&fft_out[2], &fft_mag_out[1], FFT_LENGTH/2-1);
+    fft_mag_out[0] = fabsf(fft_out[0]);
+    draw_segment_spectogram(h, fft_mag_out, window);
+}
 
 
 /*=========== error handler for fatal errors in plotter code ============ */

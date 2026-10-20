@@ -14,7 +14,7 @@
 
 /* Parameters ----------------------------------------------------------------*/
 #define AUDIO_SAMPLE_RATE_HZ        16000U
-#define AUDIO_VOLUME               40U
+#define AUDIO_VOLUME               70U
 #define AUDIO_IN_PDM_BUFFER_SIZE   ((uint32_t)(128U * AUDIO_SAMPLE_RATE_HZ / 16000U * 2U))
 #define AUDIO_PCM_BUFFER_SIZE 4096U
 #define INVERT_CH(ch) (3U - (ch)) // universal solution for mono/stereo, returns 2 for mono and 1 for stereo
@@ -31,12 +31,19 @@ ALIGN_32BYTES (uint16_t recordPDMBuff[AUDIO_IN_PDM_BUFFER_SIZE]);
 
 ALIGN_32BYTES (uint16_t recordPCMBuff[AUDIO_PCM_BUFFER_SIZE]);
 uint32_t pcmWritePtr = 0;
+uint16_t recordPCMMonoBuff[FFT_LENGTH];
 
 extern uint32_t channel_nbr;
 extern __IO uint32_t ButtonState;
 extern uint8_t CheckForUserInput(void);
 
 static audio_plotter_handle_t hplot_mems;
+
+
+
+
+
+
 
 
 /**
@@ -58,30 +65,28 @@ void PlotMemsDemo(void)
   UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_WHITE);
   UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_BLUE);
   UTIL_LCD_SetFont(&Font24);
-  UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *)"MEMS PDM RECORD PLOTTER", CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 10, (uint8_t *)"ONBOARD MEMS MICROPHONE", CENTER_MODE);
   UTIL_LCD_SetFont(&Font16);
-  UTIL_LCD_DisplayStringAt(0, 40, (uint8_t *)"Press User button to stop", CENTER_MODE);
+  //UTIL_LCD_DisplayStringAt(0, 40, (uint8_t *)"Press User button to toggle audio input", CENTER_MODE);  // not enough flash for both demos
 
   /* Plot frame */
-  UTIL_LCD_DrawRect(10, 100, x_size - 20, y_size - 110, UTIL_LCD_COLOR_BLUE);
-  UTIL_LCD_DrawRect(11, 101, x_size - 22, y_size - 112, UTIL_LCD_COLOR_BLUE);
+  //UTIL_LCD_DrawRect(10, 100, x_size - 20, y_size - 110, UTIL_LCD_COLOR_BLUE);
 
   audio_in.Device = AUDIO_IN_DEVICE_DIGITAL_MIC;
-  audio_in.ChannelsNbr = channel_nbr;
+  audio_in.ChannelsNbr = 1;
   audio_in.SampleRate = AUDIO_SAMPLE_RATE_HZ;
   audio_in.BitsPerSample = AUDIO_RESOLUTION_16B;
   audio_in.Volume = AUDIO_VOLUME;
 
   BSP_AUDIO_IN_Init(1, &audio_in);
 
-  UTIL_LCD_DisplayStringAt(0, 190, (uint8_t *)"Start Recording ", CENTER_MODE);
   BSP_AUDIO_IN_RecordPDM(1, (uint8_t*)&recordPDMBuff, 2U * AUDIO_IN_PDM_BUFFER_SIZE);
 
 
   hplot_mems.sampling.audio_source    = AUDIO_SOURCE_MEMS;
   hplot_mems.sampling.sampling_method = PEAK_DECIMATION;
   hplot_mems.sampling.data			  = (int16_t *) recordPCMBuff;
-  hplot_mems.sampling.data_size       = AUDIO_PCM_BUFFER_SIZE;
+  hplot_mems.sampling.data_size       = 512;
   hplot_mems.sampling.dma_wr          = pcmWritePtr;
   hplot_mems.main_window.x            = 12;
   hplot_mems.main_window.y            = 102;
@@ -90,10 +95,34 @@ void PlotMemsDemo(void)
 
   init_plotter(&hplot_mems);
 
+  draw_window_t spectogram_window;
+  spectogram_window.x = 12;
+  spectogram_window.y = 101;
+  spectogram_window.width = 220;
+  spectogram_window.height = 150;
+  UTIL_LCD_DrawRect(10, 100, 224, 152, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(12, 70, (uint8_t *)"Frequency histogram:", LEFT_MODE);
+
+  draw_window_t waveform_window;
+  waveform_window.x = 224 + 10 + 12;
+  waveform_window.y = 101;
+  waveform_window.width = 220;
+  waveform_window.height = 150;
+  UTIL_LCD_DrawRect(10 + 224 + 10, 100, 224, 152, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(10 + 224 + 30, 70, (uint8_t *)"   Waveform:", LEFT_MODE);
+
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+  UTIL_LCD_DisplayStringAt(8, 258, (uint8_t *)"0Hz              8kHz", LEFT_MODE);
 
   while (1)
   {
-	draw_audio_signal(&hplot_mems, MINMAX);
+	if (!queue_pop(&hplot_mems)) continue;
+	//copy_fft(&hplot_mems.sampling.data, 512, 0);
+
+	draw_waveform(&hplot_mems, waveform_window);
+	draw_freq_spectogram(&hplot_mems, spectogram_window);
+
     if (CheckForUserInput() > 0)
     {
       ButtonState = 0;
@@ -116,16 +145,22 @@ void Process_Input(uint32_t Instance, uint32_t pdm_offset)
 
 
 	// todo: extract segment size from plot_t
-	if (pcmWritePtr % hplot_mems.sampling.data_size == 0 && pcmWritePtr != 0)
+	// when pcmPointer is equal to
+	if (pcmWritePtr != 0 && pcmWritePtr % hplot_mems.sampling.data_size*2 == 0)
 	{
+		//__disable_irq();
+		//simple_downsample(&recordPCMBuff, 1024, 0, &recordPCMMonoBuff, 512);
+		//__enable_irq();
+
 		uint32_t n_samples = hplot_mems.sampling.data_size/hplot_mems.n_segments;
 		audio_segment_t seg = {
-		.p_samples = (int16_t *)&recordPCMBuff[pcmWritePtr],
-		.n_samples = hplot_mems.sampling.data_size
+		.p_samples = (int16_t *)&recordPCMBuff[0],
+		.n_samples = FFT_LENGTH*2
 		};
 
 	__disable_irq();
 	queue_push(&hplot_mems, seg);
+	copy_fft_mono(recordPCMBuff, 512, pcmWritePtr);
 	__enable_irq();
 	}
 	pcmWritePtr += AUDIO_IN_PDM_BUFFER_SIZE/4/2/INVERT_CH(channel_nbr);

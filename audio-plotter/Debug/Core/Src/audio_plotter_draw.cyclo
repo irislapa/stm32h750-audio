@@ -1,5 +1,5 @@
-../Core/Src/audio_plotter_draw.c:14:6:draw_segment_wave	9
-../Core/Src/audio_plotter_draw.c:46:6:draw_segment_minmax	10
-../Core/Src/audio_plotter_draw.c:77:6:draw_spectogram	5
-../Core/Src/audio_plotter_draw.c:104:6:draw_buffer	2
-../Core/Src/audio_plotter_draw.c:127:6:draw_segment	2
+../Core/Src/audio_plotter_draw.c:17:6:draw_segment_wave	9
+../Core/Src/audio_plotter_draw.c:49:6:draw_segment_minmax	10
+../Core/Src/audio_plotter_draw.c:80:6:draw_segment_spectogram	7
+../Core/Src/audio_plotter_draw.c:110:6:draw_buffer	2
+../Core/Src/audio_plotter_draw.c:132:6:draw_segment_waveform	2

@@ -1,6 +1,6 @@
-../Core/Src/plot_adc.c:44:6:PlotAdcDemo	2
-../Core/Src/plot_adc.c:103:19:set_DMA_buff_size	4
-../Core/Src/plot_adc.c:119:6:set_sample_size	1
-../Core/Src/plot_adc.c:124:6:set_segments	1
-../Core/Src/plot_adc.c:136:6:HAL_ADC_ConvCpltCallback	4
-../Core/Src/plot_adc.c:160:6:HAL_ADC_ConvHalfCpltCallback	4
+../Core/Src/plot_adc.c:44:6:PlotAdcDemo	3
+../Core/Src/plot_adc.c:123:19:set_DMA_buff_size	4
+../Core/Src/plot_adc.c:139:6:set_sample_size	1
+../Core/Src/plot_adc.c:144:6:set_segments	1
+../Core/Src/plot_adc.c:156:6:HAL_ADC_ConvCpltCallback	4
+../Core/Src/plot_adc.c:180:6:HAL_ADC_ConvHalfCpltCallback	4

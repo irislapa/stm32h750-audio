@@ -1584,11 +1584,14 @@ int32_t BSP_AUDIO_IN_Init(uint32_t Instance, BSP_AUDIO_Init_t *AudioInit)
 
           /* Prepare haudio_in_sai handle */
           mx_config.MonoStereoMode    = SAI_STEREOMODE;
+          //mx_config.MonoStereoMode    = SAI_MONOMODE;
           mx_config.DataSize          = SAI_DATASIZE_16;
           mx_config.FrameLength       = 32;
+          //mx_config.FrameLength       = 16;
           mx_config.ActiveFrameLength = 1;
           mx_config.OutputDrive       = SAI_OUTPUTDRIVE_DISABLE;
           mx_config.SlotActive        = SAI_SLOTACTIVE_1;
+          //mx_config.SlotActive        = SAI_SLOTACTIVE_0;
           mx_config.AudioFrequency    = Audio_In_Ctx[Instance].SampleRate*8;
           mx_config.AudioMode         = SAI_MODEMASTER_RX;
           mx_config.ClockStrobing     = SAI_CLOCKSTROBING_FALLINGEDGE;

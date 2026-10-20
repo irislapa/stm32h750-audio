@@ -4,8 +4,4 @@
 ../Core/Src/audio_plotter_sample.c:77:6:avg_downsample	48	static
 ../Core/Src/audio_plotter_sample.c:100:6:high_pass_filter	48	static
 ../Core/Src/audio_plotter_sample.c:124:6:upsample	40	static
-../Core/Src/audio_plotter_sample.c:138:6:sample_segment	64	static,ignoring_inline_asm
-../Core/Src/audio_plotter_sample.c:173:6:calculate_mean	32	static
-../Core/Src/audio_plotter_sample.c:183:6:normalise_data_to_float	32	static
-../Core/Src/audio_plotter_sample.c:194:6:preprocess_fft	40	static
-../Core/Src/audio_plotter_sample.c:208:6:postprocess_fft	32	static
+../Core/Src/audio_plotter_sample.c:138:6:sample_segment	48	static

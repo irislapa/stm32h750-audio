@@ -68,8 +68,8 @@ void peak_downsample(const uint16_t *p_buff_in, uint32_t in_size,
       if (s < mn) mn = s;
       if (s > mx) mx = s;
     }
-    p_buff_out[2*g]     = mn;
-    p_buff_out[2*g + 1] = mx;
+    p_buff_out[2*g]     = mn/2;
+    p_buff_out[2*g + 1] = mx/2;
   }
 }
 
@@ -137,15 +137,15 @@ void upsample(const int16_t *p_buff_in, uint32_t in_size, int16_t *p_buff_out, u
 
 void sample_segment(audio_plotter_handle_t *h, uint8_t draw_mehod)
 {
-	uint16_t *p_buff_in = h->current_segment.p_samples;
-    uint32_t in_size    = h->current_segment.n_samples;
+	uint16_t *p_buff_in = h->sampling.data;
+    uint32_t in_size    = h->sampling.data_size;
     int16_t *p_buff_out = h->drawing.data;
     uint32_t out_size   = h->drawing.data_size;
     uint32_t dc_offset  = h->sampling.dc_offset;
 
     if ((uint16_t *)p_buff_in == NULL || in_size == 0) return;
 
-    SCB_InvalidateDCache_by_Addr((uint16_t *)p_buff_in, in_size*sizeof(uint16_t));
+    //SCB_InvalidateDCache_by_Addr((uint16_t *)p_buff_in, in_size*sizeof(uint16_t));
 
     switch (h->sampling.sampling_method)
     {
@@ -170,46 +170,5 @@ void sample_segment(audio_plotter_handle_t *h, uint8_t draw_mehod)
     }
 }
 
-void calculate_mean(uint16_t *data, uint32_t data_size, uint32_t *result)
-{
-	int32_t res = 0;
-	for (int i = 0; i < data_size; i++)
-	{
-		res += (int16_t) data[i];
-	}
-	*result = res/data_size;
-}
 
-void normalise_data_to_float(uint16_t *raw_data, float32_t *out_data, uint32_t data_size)
-{
-	uint32_t mean;
-	calculate_mean(raw_data, data_size, mean);
-	for (int i = 0; i < data_size; i++)
-	{
-		out_data[i] = (float32_t) (((int16_t) raw_data[i]) - (int16_t) mean);
-	}
-}
-
-
-void preprocess_fft(uint16_t *raw_data, float32_t *processed_data, uint32_t data_size)
-{
-	int32_t mean = 0;
-	for (int i = 0; i < data_size; i++)
-	{
-		mean += (int16_t) raw_data[i];
-	}
-	mean = mean/data_size;
-	for (int i = 0; i < data_size; i++)
-	{
-		processed_data[i] = (float32_t) (((int16_t) raw_data[i]) - (int16_t) mean);
-	}
-}
-
-void postprocess_fft(float32_t *fft_out, float32_t *fft_mag_in, uint32_t data_size)
-{
-	for (int i = 0; i < data_size; i++)
-	{
-		fft_mag_in[i] = fft_out[i]*2/data_size;
-	}
-}
 
