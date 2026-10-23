@@ -1,8 +1,8 @@
 ../Core/Src/audio_plotter.c:32:6:segment_config	4
-../Core/Src/audio_plotter.c:50:6:init_plotter	5
-../Core/Src/audio_plotter.c:83:6:copy_fft	2
-../Core/Src/audio_plotter.c:92:6:copy_fft_mono	2
-../Core/Src/audio_plotter.c:102:6:apply_hanning	2
-../Core/Src/audio_plotter.c:151:6:draw_waveform	1
-../Core/Src/audio_plotter.c:159:6:draw_freq_spectogram	1
-../Core/Src/audio_plotter.c:173:6:error_handler	1
+../Core/Src/audio_plotter.c:49:6:init_plotter	5
+../Core/Src/audio_plotter.c:82:6:copy_fft	2
+../Core/Src/audio_plotter.c:91:6:copy_fft_mono	2
+../Core/Src/audio_plotter.c:101:6:apply_hanning	2
+../Core/Src/audio_plotter.c:150:6:draw_waveform	1
+../Core/Src/audio_plotter.c:158:6:draw_freq_spectogram	1
+../Core/Src/audio_plotter.c:172:6:error_handler	1

@@ -2,4 +2,4 @@
 ../Core/Src/audio_plotter_draw.c:49:6:draw_segment_minmax	10
 ../Core/Src/audio_plotter_draw.c:80:6:draw_segment_spectogram	7
 ../Core/Src/audio_plotter_draw.c:110:6:draw_buffer	2
-../Core/Src/audio_plotter_draw.c:132:6:draw_segment_waveform	2
+../Core/Src/audio_plotter_draw.c:133:6:draw_segment_waveform	2

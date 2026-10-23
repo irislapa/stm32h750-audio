@@ -1175,7 +1175,6 @@ void segment_config(audio_plotter_handle_t *h, uint16_t n_segments)
 08000ce8 <init_plotter>:
 
 
-// todo: define default setup
 void init_plotter(audio_plotter_handle_t *h)
 {
  8000ce8:	b580      	push	{r7, lr}
@@ -1913,10 +1912,10 @@ void draw_segment_spectogram(audio_plotter_handle_t *h, float32_t *data, draw_wi
  8001208:	ff0000ff 	.word	0xff0000ff
 
 0800120c <draw_segment_waveform>:
-  draw_segment_minmax(h->drawing.data, h->drawing.data_size, h->drawing.window);
 }
 
 
+// Plots the waveform data over 1 segment in given window. Number of segments can be configured with segment_config() in audio_plotter.c
 void draw_segment_waveform(audio_plotter_handle_t *h, uint8_t draw_method, draw_window_t window)
 {
  800120c:	b580      	push	{r7, lr}
