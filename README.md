@@ -63,7 +63,7 @@ Currently the project runs on preconfigured sample sizes, but can be adjusted, s
 - Defaults live in `audio_plotter.h` and `audio_plotter_config.h`:
 ## Building & running
 
-1. Open the project in STM32CubeIDE.
+1. Open the project in STM32CubeIDE ... open_project_from_file_system -> select directory -> `audio_plotter`.
 2. In `main.c`, select the demo by uncommenting: `PlotMemsDemo()` or `PlotADC_demo()`.
 3. Build and flash to the STM32H750B-DK.
 
