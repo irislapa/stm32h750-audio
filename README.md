@@ -41,7 +41,7 @@ A real-time audio waveform plotter implemented on **STM32H750B-DK** discovery bo
 
 ## Connecting ADC microphone to the board:
 ![analog_mic|266](attachments/microphone.jpg)![analog_mic|151](attachments/connect_microphone_to_board.jpg)
-![[analog_mic|146](attachments/microphone_on_scheme.png)
+![analog_mic|146](attachments/microphone_on_scheme.png)
 
 
 ## Current MEMS vs ADC configuration:
